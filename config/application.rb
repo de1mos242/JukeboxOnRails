@@ -17,6 +17,17 @@ module JukeboxOnRails
 
     # Custom directories with classes and modules you want to be autoloadable.
     # config.autoload_paths += %W(#{config.root}/extras)
+    config.autoload_paths += %W(#{config.root}/lib)
+    config.autoload_paths += %W(#{config.root}/lib/audio)
+    config.autoload_paths += %W(#{config.root}/lib/audio_providers)
+    config.autoload_paths += Dir["#{config.root}/lib/**/"]
+    config.autoload_paths += Dir["#{config.root}/lib/audio/**/"]
+    config.autoload_paths += Dir["#{config.root}/lib/audio_providers/**/"]
+
+    vk_config_path = Rails.root.join("config","audio_providers", "vk.yml")
+    config.vk_config = YAML.load_file(vk_config_path)[Rails.env]
+
+    config.songs_path = Rails.root.join("downloaded_tracks")
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
