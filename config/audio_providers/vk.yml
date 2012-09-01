@@ -1,0 +1,13 @@
+development: &defaults
+  :vkontakte:
+    :login: email@gmail.com
+    :password: password
+
+test:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+production:
+  <<: *defaults
