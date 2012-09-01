@@ -1,5 +1,7 @@
-%td= link_to item.artist, item
-%td= link_to item.title, item
+%td= item.artist
+%td= item.title[0...50]
+%td
+  %span.badge.badge-success= item.downloaded? ? "downloaded" : ""
 %td
   - unless item.in_playlist?
     = form_tag(add_to_playlist_path(item), remote:true) do |form|
