@@ -1,8 +1,8 @@
 %h1 Listing songs
 
-%form{action:find_songs_path, method:"POST"}
-  %input{type:'text', name:'find_query'}
-  %input{type:'submit', value:'find'}
+= form_tag(find_songs_path) do |form|
+  = search_field_tag 'find_query'
+  = submit_tag 'find'
 
 %table
   %tr

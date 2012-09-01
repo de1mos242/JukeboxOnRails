@@ -106,7 +106,11 @@ class SongsController < ApplicationController
     else
       @songs = Song.downloaded
     end
-    render :index
+    respond_to do |format|
+      format.html { render :index }
+      format.json { render json: @songs }
+    end
+    
   end
 
   def download

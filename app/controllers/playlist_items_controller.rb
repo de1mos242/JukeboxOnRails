@@ -1,8 +1,11 @@
 class PlaylistItemsController < ApplicationController
+  include AudioPlayback 
+
   # GET /playlist_items
   # GET /playlist_items.json
   def index
     @playlist_items = PlaylistItem.position_sorted
+    @volumes = AudioPlayback::MPGPlayback.get_current_volume
 
     respond_to do |format|
       format.html # index.html.erb
@@ -88,6 +91,12 @@ class PlaylistItemsController < ApplicationController
 
   def skip
     Playlist.skip
+    render :nothing => true
+  end
+
+  def change_volume
+    AudioPlayback::MPGPlayback.set_volume(params["volume"])
+
     render :nothing => true
   end
 end

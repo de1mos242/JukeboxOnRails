@@ -12,6 +12,13 @@ module AudioPlayback
 
 	public
 
+		def self.set_volume(value)
+			raise "Not implemented"
+		end
+
+		def self.get_current_volume
+			raise "Not implemented"
+		end
 		
 		def self.playing?
 			update_state

@@ -5,6 +5,7 @@ JukeboxOnRails::Application.routes.draw do
 
   match 'playlist_items/stop' => 'playlist_items#stop', :as => :playlist_stop
   match 'playlist_items/skip' => 'playlist_items#skip', :as => :playlist_skip
+  match 'playlist_items/volume' => 'playlist_items#change_volume', :as => :change_volume
   match 'songs/find' => 'songs#find', :as => :find_songs
   match 'songs/:id/queue' => 'songs#add_to_playlist', :as => :add_to_playlist
 
