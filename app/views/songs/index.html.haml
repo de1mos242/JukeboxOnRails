@@ -1,43 +1,22 @@
 %h1 Listing songs
 
-= form_tag(stop_song_path, remote:true) do |form|
-  = submit_tag 'stop'
+%form{action:find_songs_path, method:"POST"}
+  %input{type:'text', name:'find_query'}
+  %input{type:'submit', value:'find'}
 
 %table
   %tr
     %th Artist
     %th Title
+    %th Downloaded
     %th
     
   - @songs.each do |song|
     %tr
       %td= link_to song.artist, song
       %td= link_to song.title, song
+      %td= song.downloaded? ? "yes" : ""
       %td
-        = form_tag(add_to_playlist_path(song), remote:true) do |form|
-          = submit_tag 'add to playlist'
-%br
-
-= link_to 'New Song', new_song_path
-
-= link_to 'Reload', songs_path
-
-%form{action:find_songs_path, method:"POST"}
-  %input{type:'text', name:'find_query'}
-  %input{type:'submit', value:'find'}
-
-- unless @finded_songs.nil?
-  %h2 finded songs
-  %table
-    %thead
-      %th Artist
-      %th Title
-      %th
-    %tbody
-    - @finded_songs.each do |song|
-      %tr
-        %td= song.artist
-        %td= song.title
-        %td
+        - unless song.in_playlist?
           = form_tag(add_to_playlist_path(song), remote:true) do |form|
             = submit_tag 'add to playlist'

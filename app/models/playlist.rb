@@ -11,6 +11,10 @@ class Playlist
 		end
 	end
 
+	def self.current_song
+		@@current_song
+	end
+
 	def self.add_song(song)
 		PlaylistItem.add(song)
 		unless song.downloaded?
@@ -67,6 +71,7 @@ class Playlist
 			end
 			@@has_waiter = false
 			Playlist.refresh
+			Thread.exit
 		end
 	end
 	

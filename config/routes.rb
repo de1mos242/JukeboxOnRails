@@ -3,7 +3,8 @@ JukeboxOnRails::Application.routes.draw do
 
   resources :songs
 
-  match 'songs/stop' => 'songs#stop', :as => :stop_song
+  match 'playlist_items/stop' => 'playlist_items#stop', :as => :playlist_stop
+  match 'playlist_items/skip' => 'playlist_items#skip', :as => :playlist_skip
   match 'songs/find' => 'songs#find', :as => :find_songs
   match 'songs/:id/queue' => 'songs#add_to_playlist', :as => :add_to_playlist
 

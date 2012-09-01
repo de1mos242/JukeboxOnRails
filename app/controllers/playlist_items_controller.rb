@@ -80,4 +80,14 @@ class PlaylistItemsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def stop
+    Playlist.stop
+    render :nothing => true
+  end
+
+  def skip
+    Playlist.skip
+    render :nothing => true
+  end
 end

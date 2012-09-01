@@ -92,22 +92,20 @@ class SongsController < ApplicationController
     redirect_to @song
   end
 
-  def stop
-    Playlist.stop
-    render :nothing => true
-  end
-
   def find
-    finded_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])
-    @finded_songs = []
-    finded_songs.each do |song_data|
-      song = Song.find_by_url(song_data[:url])
-      if song.nil?
-        song = Song.create(artist:song_data[:artist], title:song_data[:track_name], url:song_data[:url])
+    unless params["find_query"].blank?
+      finded_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])
+      @songs = []
+      finded_songs.each do |song_data|
+        song = Song.find_by_url(song_data[:url])
+        if song.nil?
+          song = Song.create(artist:song_data[:artist], title:song_data[:track_name], url:song_data[:url])
+        end
+        @songs.push(song)
       end
-      @finded_songs.push(song)
+    else
+      @songs = Song.downloaded
     end
-    @songs = Song.downloaded
     render :index
   end
 

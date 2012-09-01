@@ -1,5 +1,11 @@
 %h1 Listing playlist_items
 
+= form_tag(playlist_stop_path, remote:true) do |form|
+  = submit_tag 'stop'
+
+= form_tag(playlist_skip_path, remote:true) do |form|
+  = submit_tag 'skip'
+
 %table
   %tr
     %th artist
@@ -10,6 +16,3 @@
       %td= playlist_item.song.artist
       %td= playlist_item.song.title
     
-%br
-
-= link_to 'New Playlist item', new_playlist_item_path

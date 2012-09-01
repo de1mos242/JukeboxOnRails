@@ -3,10 +3,21 @@ require "open-uri"
 class Song < ActiveRecord::Base
   attr_accessible :artist, :filename, :title, :url
 
+  validate :artist, presents:true
+  validate :title, presents:true
+  validate :url, presents:true
+
   scope :downloaded, conditions: "filename is not null"
+  scope :in_playlist, joins().where("songs.filename is not null")
   
   def downloaded?
   	not self.filename.blank?
+  end
+
+  def in_playlist?
+    return true unless PlaylistItem.with_song(self).first.nil?
+    return false if Playlist.current_song.nil?
+    Playlist.current_song.id == self.id
   end
 
   def download
@@ -34,7 +45,7 @@ class Song < ActiveRecord::Base
 		if block_given?
 			yield
 		end
-
+		Thread.exit
       end
 
     rescue NotImplementedError
