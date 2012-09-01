@@ -13,12 +13,6 @@
   %b Filename:
   = @song.filename
 
-%form{action:play_song_path(@song)}
-  %input{type:'submit', value:'play'}
-
-%form{action:stop_song_path(@song)}
-  %input{type:'submit', value:'stop'}
-
 = link_to 'Edit', edit_song_path(@song)
 \|
 = link_to 'Back', songs_path

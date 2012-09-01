@@ -4,7 +4,7 @@ module AudioPlayback
 
     attr_reader :paused, :music_file
     attr_accessor :player, :playing_pid
-
+    
     def initialize(music_file)
       set_music_file(music_file)
       @paused = false
@@ -71,34 +71,17 @@ module AudioPlayback
       end
     end
 
-    # make system call and get pid so you can terminate process
     def system_yield_pid(player, filename)
-      # would like to use Process.respond_to?(:fork) but JRuby mistakenly returns true
-      if (defined?(JRUBY_VERSION) || RUBY_PLATFORM == 'java')
-        pid = Spoon.spawnp("#{player}", "#{filename}")
-      else
-        begin
-          pid = fork do             # creates and runs block in subprocess (which will terminate with status 0), capture subprocess pid
-            exec(player,filename)   # replaces current process with system call
-            exit! 127               # exit process and return exit status 127; should never be reached
-          end
-        rescue NotImplementedError
-          raise "*** fork()...exec() not supported ***"
+      begin
+        pid = fork do             # creates and runs block in subprocess (which will terminate with status 0), capture subprocess pid
+          exec(player,filename)   # replaces current process with system call
+          exit! 127               # exit process and return exit status 127; should never be reached
         end
+      rescue NotImplementedError
+        raise "*** fork()...exec() not supported ***"
       end
       yield pid if block_given? # call block, passing in the subprocess pid
-      #if pid
-      #  puts "pid: #{pid}"
-      #  puts "current_song: #{Jukebox.current_song.inspect}"
-      #else
-      #  puts "No process id (pid)!"
-      #  raise "@current_song: #{Jukebox.current_song.inspect}"
-      #end
       Process.detach(pid)
-      #Process.waitpid(pid)      # Waits for a child process to exit, returns its process id, and sets $? to a Process::Status object
-      #$?                        # return Process::Status object with instance methods .stopped?, .exited?, .exitstatus; see: http://www.ruby-doc.org/core/classes/Process/Status.html
-      0
-
     end
   end
 

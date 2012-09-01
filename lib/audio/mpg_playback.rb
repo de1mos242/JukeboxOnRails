@@ -25,7 +25,7 @@ module AudioPlayback
 		end
 
 		def alive?
-			system("pidof mpg123")
+			system("pidof mpg123 > /dev/null")
 		end
 
 	private

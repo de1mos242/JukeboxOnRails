@@ -93,9 +93,8 @@ class SongsController < ApplicationController
   end
 
   def stop
-    @song = Song.find(params[:id])
-    AudioPlayback::MPGPlayback.stop
-    redirect_to @song
+    Playlist.stop
+    render :nothing => true
   end
 
   def find
@@ -114,7 +113,16 @@ class SongsController < ApplicationController
 
   def download
     @song = Song.find(params[:id])
-    @song.download
+    @song.download do
+      Playlist.refresh
+    end
+    
+    render :nothing => true
+  end
+
+  def add_to_playlist
+    song = Song.find(params[:id])
+    Playlist.add_song(song)
     
     render :nothing => true
   end

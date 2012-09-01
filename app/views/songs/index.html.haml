@@ -1,28 +1,26 @@
 %h1 Listing songs
 
+= form_tag(stop_song_path, remote:true) do |form|
+  = submit_tag 'stop'
+
 %table
   %tr
     %th Artist
     %th Title
-    %th Url
-    %th Filename
     %th
-    %th
-    %th
-
+    
   - @songs.each do |song|
     %tr
-      %td= song.artist
-      %td= song.title
-      %td= song.url
-      %td= song.filename
-      %td= link_to 'Show', song
-      %td= link_to 'Edit', edit_song_path(song)
-      %td= link_to 'Destroy', song, :data => { :confirm => 'Are you sure?' }, :method => :delete
-
+      %td= link_to song.artist, song
+      %td= link_to song.title, song
+      %td
+        = form_tag(add_to_playlist_path(song), remote:true) do |form|
+          = submit_tag 'add to playlist'
 %br
 
 = link_to 'New Song', new_song_path
+
+= link_to 'Reload', songs_path
 
 %form{action:find_songs_path, method:"POST"}
   %input{type:'text', name:'find_query'}
@@ -34,13 +32,12 @@
     %thead
       %th Artist
       %th Title
-      %th Url
+      %th
+    %tbody
     - @finded_songs.each do |song|
       %tr
         %td= song.artist
         %td= song.title
-        %td= song.url
         %td
-          = form_tag(download_song_path(song), remote:true) do |form|
-            = submit_tag 'Download'
-
+          = form_tag(add_to_playlist_path(song), remote:true) do |form|
+            = submit_tag 'add to playlist'

@@ -2,7 +2,7 @@ class PlaylistItemsController < ApplicationController
   # GET /playlist_items
   # GET /playlist_items.json
   def index
-    @playlist_items = PlaylistItem.all
+    @playlist_items = PlaylistItem.position_sorted
 
     respond_to do |format|
       format.html # index.html.erb

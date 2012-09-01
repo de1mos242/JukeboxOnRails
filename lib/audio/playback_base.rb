@@ -1,7 +1,8 @@
 module AudioPlayback
 
 	class PlaybackBase
-
+		@@current_song = nil
+		
 	private
 		def self.update_state
 			unless @@current_song.nil?
@@ -11,7 +12,11 @@ module AudioPlayback
 
 	public
 
-		@@current_song = nil
+		
+		def self.playing?
+			update_state
+			not @@current_song.nil?
+		end
 
 		def initialize(music_file)
 			@music_file = music_file
@@ -26,16 +31,16 @@ module AudioPlayback
 		def play
 			self.class.update_state
 
-			puts "\n\n\n!!!\n!\ncheck cursong #{@@current_song}" 
-
-			if @@current_song.nil?
-
-				@@current_song = self
-
-				on_play
-				
-				@paused = false
+			unless @@current_song.nil?
+				@@current_song.on_stop
+				@@current_song = nil
 			end
+
+			@@current_song = self
+
+			on_play
+				
+			@paused = false
 		end
 
 		def self.pause

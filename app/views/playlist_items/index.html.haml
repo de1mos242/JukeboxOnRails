@@ -2,20 +2,14 @@
 
 %table
   %tr
-    %th Song
-    %th Position
-    %th
-    %th
-    %th
-
+    %th artist
+    %th title
+    
   - @playlist_items.each do |playlist_item|
     %tr
-      %td= playlist_item.song
-      %td= playlist_item.position
-      %td= link_to 'Show', playlist_item
-      %td= link_to 'Edit', edit_playlist_item_path(playlist_item)
-      %td= link_to 'Destroy', playlist_item, :confirm => 'Are you sure?', :method => :delete
-
+      %td= playlist_item.song.artist
+      %td= playlist_item.song.title
+    
 %br
 
 = link_to 'New Playlist item', new_playlist_item_path

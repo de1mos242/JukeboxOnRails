@@ -5,6 +5,9 @@ class Song < ActiveRecord::Base
 
   scope :downloaded, conditions: "filename is not null"
   
+  def downloaded?
+  	not self.filename.blank?
+  end
 
   def download
   	begin
@@ -14,7 +17,8 @@ class Song < ActiveRecord::Base
   	  url = self.url
   	  song_id = self.id
   	  puts "\n\n\nstart"
-      pid = fork do
+  	  puts "block: #{block_given?}"
+      Thread.new do
       	puts "\n\n\nfork"
         open(filename, 'wb') do |dst|
 		  open(url) do |src|
@@ -26,9 +30,13 @@ class Song < ActiveRecord::Base
 		song.filename = filename.to_s
 		song.save
 		puts "\n\n\nsaved"
+		puts "block: #{block_given?}"
+		if block_given?
+			yield
+		end
+
       end
 
-      Process.detach(pid)
     rescue NotImplementedError
       raise "*** fork()...exec() not supported ***"
     end

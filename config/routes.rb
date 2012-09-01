@@ -3,10 +3,9 @@ JukeboxOnRails::Application.routes.draw do
 
   resources :songs
 
-  match 'songs/:id/play' => 'songs#play', :as => :play_song
-  match 'songs/:id/stop' => 'songs#stop', :as => :stop_song
+  match 'songs/stop' => 'songs#stop', :as => :stop_song
   match 'songs/find' => 'songs#find', :as => :find_songs
-  match 'songs/:id/download' => 'songs#download', :as => :download_song
+  match 'songs/:id/queue' => 'songs#add_to_playlist', :as => :add_to_playlist
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
@@ -57,7 +56,7 @@ JukeboxOnRails::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => 'welcome#index'
+  root :to => 'songs#index'
 
   # See how all your routes lay out with "rake routes"
 

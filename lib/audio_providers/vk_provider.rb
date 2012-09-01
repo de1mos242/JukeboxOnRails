@@ -26,7 +26,7 @@ module AudioProviders
 
 			conn = Net::HTTP.new(site, port) 	
 			headers = { "Cookie" => "remixsid=#{sid}; path=/; domain=.vk.com" }
-			find_params = { section: "audio", q: query, name:1 }
+			find_params = { section: "audio", q: query.encode('windows-1251', 'utf-8'), name:1 }
 			resp = conn.get("http://vk.com/al_search.php?" + URI.encode_www_form(find_params), headers)
 			
 			songs = resp.body
@@ -42,10 +42,7 @@ module AudioProviders
 				artist = CGI.unescapeHTML(artist)
 				
 				link = /value=\"(?<url>[^,]+)/.match(divs[i])["url"]
-				puts "track #{track_name_divs[i]}"
 				test = /\>(\<a.+?\>)?(?<name>.+)\<\/a\>/.match(track_name_divs[i])
-				puts "match #{test.inspect}"
-				puts "divs: #{divs.size} title: #{artists_divs.size} trucks: #{track_name_divs.size}"
 				track_name = /\>(\<a.+?\>)?(?<name>.+)\<span class=\"user/.match(track_name_divs[i])['name'].encode('utf-8', 'windows-1251').gsub(/\<.+?\>/, '')
 				track_name = CGI.unescapeHTML(track_name)
 
