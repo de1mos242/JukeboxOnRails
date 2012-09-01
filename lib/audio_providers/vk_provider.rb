@@ -32,7 +32,7 @@ module AudioProviders
 			songs = resp.body
 			
 			artists_divs = songs.scan(/\/search\?section=audio.+?\<\/a\>/)
-			track_name_divs = songs.scan(/span class=\"title\" id=\"title.+?\<\/a\>/)
+			track_name_divs = songs.scan(/span class=\"title\" id=\"title.+?\<span class=\"user/)
 			divs = songs.scan(/input type=\"hidden\" id=\"audio_.*\" \/\>/)
 
 			result = []
@@ -42,8 +42,11 @@ module AudioProviders
 				artist = CGI.unescapeHTML(artist)
 				
 				link = /value=\"(?<url>[^,]+)/.match(divs[i])["url"]
-
-				track_name = /\>\<a.+?\>(?<name>.+)\<\/a\>/.match(track_name_divs[i])['name'].encode('utf-8', 'windows-1251').gsub(/\<.+?\>/, '')
+				puts "track #{track_name_divs[i]}"
+				test = /\>(\<a.+?\>)?(?<name>.+)\<\/a\>/.match(track_name_divs[i])
+				puts "match #{test.inspect}"
+				puts "divs: #{divs.size} title: #{artists_divs.size} trucks: #{track_name_divs.size}"
+				track_name = /\>(\<a.+?\>)?(?<name>.+)\<span class=\"user/.match(track_name_divs[i])['name'].encode('utf-8', 'windows-1251').gsub(/\<.+?\>/, '')
 				track_name = CGI.unescapeHTML(track_name)
 
 				#puts "#{artist} - #{track_name}"
