@@ -94,7 +94,7 @@ class SongsController < ApplicationController
 
   def find
     unless params["find_query"].blank?
-      finded_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])
+      finded_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])[0...30]
       @songs = []
       finded_songs.each do |song_data|
         song = Song.find_by_url(song_data[:url])

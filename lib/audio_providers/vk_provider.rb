@@ -4,27 +4,19 @@ require 'cgi'
 module AudioProviders
 
 	class VKProvider
+		@@login_sid = nil
+		@@site = "vk.com"
+		@@port = 80
 
 		def self.find_by_query(query)
 			if query.blank?
 				return []
 			end
 
-			site = "vk.com"
-			port = 80
-			
-			vk_config = Rails.application.config.vk_config[:vkontakte]
-			email = vk_config[:login]
-			pass = vk_config[:password]
-			login_page = "http://vk.com/login.php"
-			
-			conn = Net::HTTP.new(site, port)
-			params = { m:1, email:email, pass:pass }
-			resp = conn.get("#{login_page}?"+URI.encode_www_form(params))
-			cookie = resp.response['set-cookie']
-			sid = /remixsid=(?<data>[a-z0-9]+)/.match(resp['Set-Cookie'])['data']
+			login if @@login_sid.blank?
+			sid = @@login_sid
 
-			conn = Net::HTTP.new(site, port) 	
+			conn = Net::HTTP.new(@@site, @@port) 	
 			headers = { "Cookie" => "remixsid=#{sid}; path=/; domain=.vk.com" }
 			find_params = { section: "audio", q: query.encode('windows-1251', 'utf-8'), name:1 }
 			resp = conn.get("http://vk.com/al_search.php?" + URI.encode_www_form(find_params), headers)
@@ -52,6 +44,19 @@ module AudioProviders
 			end
 
 			result
+		end
+
+		def self.login
+			vk_config = Rails.application.config.vk_config[:vkontakte]
+			email = vk_config[:login]
+			pass = vk_config[:password]
+			login_page = "http://vk.com/login.php"
+			
+			conn = Net::HTTP.new(@@site, @@port)
+			params = { m:1, email:email, pass:pass }
+			resp = conn.get("#{login_page}?"+URI.encode_www_form(params))
+			cookie = resp.response['set-cookie']
+			@@login_sid = /remixsid=(?<data>[a-z0-9]+)/.match(resp['Set-Cookie'])['data']
 		end
 
 	end

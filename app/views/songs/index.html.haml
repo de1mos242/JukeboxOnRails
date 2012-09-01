@@ -1,22 +1,22 @@
-%h1 Listing songs
+%h1 Songs
 
-= form_tag(find_songs_path) do |form|
-  = search_field_tag 'find_query'
-  = submit_tag 'find'
+= form_tag(find_songs_path, class:"form-search") do |form|
+  = search_field_tag 'find_query', "", class: "search-query"
+  = submit_tag 'find', class: "btn"
 
-%table
-  %tr
-    %th Artist
-    %th Title
-    %th Downloaded
-    %th
-    
-  - @songs.each do |song|
+%table.table.table-striped.table-hover.table-condensed
+  %thead
     %tr
-      %td= link_to song.artist, song
-      %td= link_to song.title, song
-      %td= song.downloaded? ? "yes" : ""
-      %td
-        - unless song.in_playlist?
-          = form_tag(add_to_playlist_path(song), remote:true) do |form|
-            = submit_tag 'add to playlist'
+      %th Artist
+      %th Title
+      %th
+      
+  %tbody
+    - @songs.each do |song|
+      -if song.downloaded?
+        %tr.success
+          = render partial: "item", object: song   
+      -else
+        %tr.info
+          = render partial: "item", object: song   
+        

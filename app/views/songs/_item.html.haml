@@ -1,0 +1,6 @@
+%td= link_to item.artist, item
+%td= link_to item.title, item
+%td
+  - unless item.in_playlist?
+    = form_tag(add_to_playlist_path(item), remote:true) do |form|
+      = submit_tag 'add to playlist', class:"btn"

@@ -10,13 +10,14 @@
   = range_field_tag 'volume', @volumes[:current], in: @volumes[:min]..@volumes[:max]
   = submit_tag 'chenge volume'
 
-%table
-  %tr
-    %th artist
-    %th title
-    
-  - @playlist_items.each do |playlist_item|
+%table.table.table-striped
+  %thead
     %tr
-      %td= playlist_item.song.artist
-      %td= playlist_item.song.title
+      %th artist
+      %th title
+  %tbody
+    - @playlist_items.each do |playlist_item|
+      %tr
+        %td= playlist_item.song.artist
+        %td= playlist_item.song.title
     
