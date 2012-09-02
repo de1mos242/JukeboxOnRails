@@ -99,4 +99,12 @@ class PlaylistItemsController < ApplicationController
 
     render :nothing => true
   end
+
+  def now_playing
+    @current_song = Playlist.current_song
+    respond_to do |format|
+      format.html {redirect_to :back}
+      format.js
+    end
+  end
 end

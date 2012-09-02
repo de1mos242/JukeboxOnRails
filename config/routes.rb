@@ -1,11 +1,13 @@
 JukeboxOnRails::Application.routes.draw do
-  resources :playlist_items
+  #resources :playlist_items
 
   resources :songs
 
+  match 'playlist_items' => 'playlist_items#index', :as => :playlist_items
   match 'playlist_items/stop' => 'playlist_items#stop', :as => :playlist_stop
   match 'playlist_items/skip' => 'playlist_items#skip', :as => :playlist_skip
   match 'playlist_items/volume' => 'playlist_items#change_volume', :as => :change_volume
+  match 'playlist_items/update_current_song' => 'playlist_items#now_playing', :as => :update_now_playing
   match 'songs/find' => 'songs#find', :as => :find_songs
   match 'songs/:id/queue' => 'songs#add_to_playlist', :as => :add_to_playlist
 

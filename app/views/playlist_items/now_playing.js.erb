@@ -1,0 +1,5 @@
+<% unless @current_song.nil? %>
+	$("#current_song").html("<%= @current_song.artist %> - <%= @current_song.title %>")
+<% else %>
+	$("#current_song").empty()
+<% end %>
