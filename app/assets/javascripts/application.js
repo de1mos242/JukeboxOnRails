@@ -14,9 +14,3 @@
 //= require jquery_ujs
 //= require bootstrap
 //= require_tree .
-
-var updateNowPlaying = function() {
-  $.getScript('/playlist_items/update_current_song');
-}
-
-setInterval(updateNowPlaying, 2000);

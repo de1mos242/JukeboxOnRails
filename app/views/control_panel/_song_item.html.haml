@@ -1,0 +1,9 @@
+%td= song_item.artist
+%td= song_item.title[0...50]
+%td
+  -if song_item.downloaded?
+    %span.badge.badge-success= 'downloaded'
+%td
+  - unless song_item.in_playlist?
+    = form_tag(add_to_playlist_path(song_item), remote:true) do |form|
+      = submit_tag 'add to playlist', class:"btn"
