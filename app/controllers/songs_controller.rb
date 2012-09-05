@@ -97,9 +97,9 @@ class SongsController < ApplicationController
       finded_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])[0...30]
       @songs = []
       finded_songs.each do |song_data|
-        song = Song.find_by_url(song_data[:url])
+        song = Song.with_url(song_data[:url]).first
         if song.nil?
-          song = Song.create(artist:song_data[:artist], title:song_data[:track_name], url:song_data[:url])
+          song = Song.new(artist:song_data[:artist], title:song_data[:track_name], url:song_data[:url])
         end
         @songs.push(song)
       end
@@ -123,9 +123,14 @@ class SongsController < ApplicationController
   end
 
   def add_to_playlist
-    song = Song.find(params[:id])
-    Playlist.add_song(song)
+    if Song.exists?(params[:song][:id])
+      song = Song.find(params[:song][:id])
+    else
+      user_song = params[:song]
+      song = Song.create(artist:user_song[:artist], title:user_song[:title], url:user_song[:url])
+    end
     
+    Playlist.add_song(song)
     render :nothing => true
   end
 end

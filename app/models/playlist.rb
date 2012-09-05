@@ -19,14 +19,14 @@ class Playlist
 		PlaylistItem.add(song)
 		unless song.downloaded?
 			song.download do
-      			Playlist.refresh
-    		end
+    			Playlist.refresh unless Playlist.playing?
+  		end
 		end
 		Playlist.refresh
 	end	
 
 	def self.playing?
-		not @@current_song.nil?
+		AudioPlayback::MPGPlayback.playing?
 	end
 
 	def self.skip

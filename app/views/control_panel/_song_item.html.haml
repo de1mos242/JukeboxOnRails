@@ -1,9 +1,11 @@
-%td= song_item.artist
-%td= song_item.title[0...50]
-%td
-  -if song_item.downloaded?
-    %span.badge.badge-success= 'downloaded'
-%td
-  - unless song_item.in_playlist?
-    = form_tag(add_to_playlist_path(song_item), remote:true) do |form|
-      = submit_tag 'add to playlist', class:"btn"
+= form_for song_item, url:add_to_playlist_path, remote:true, :html => { :class => "song well"} do |f|
+  = f.hidden_field :artist
+  = f.hidden_field :title
+  = f.hidden_field :url
+  = f.hidden_field :id
+  .song_data
+    %span.artist= "#{song_item.artist}"
+    %span= " - "
+    %span.title= "#{song_item.title}"
+  .actions
+    = f.submit 'add to playlist', class:"btn btn-info add_to_playlist pull-right"

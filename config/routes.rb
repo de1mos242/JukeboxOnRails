@@ -1,17 +1,19 @@
 JukeboxOnRails::Application.routes.draw do
-  get "control_panel/index"
-
   #resources :playlist_items
 
-  resources :songs
+  #resources :songs
+  get "songs/index", :as => :songs
 
   match 'playlist_items' => 'playlist_items#index', :as => :playlist_items
   match 'playlist_items/stop' => 'playlist_items#stop', :as => :playlist_stop
   match 'playlist_items/skip' => 'playlist_items#skip', :as => :playlist_skip
   match 'playlist_items/volume' => 'playlist_items#change_volume', :as => :change_volume
   match 'playlist_items/update_current_song' => 'playlist_items#now_playing', :as => :update_now_playing
+
   match 'songs/find' => 'songs#find', :as => :find_songs
-  match 'songs/:id/queue' => 'songs#add_to_playlist', :as => :add_to_playlist
+  match 'songs/queue' => 'songs#add_to_playlist', :as => :add_to_playlist
+
+  match "control_panel/index" => 'control_panel#index', as: :control_panel
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -5,4 +5,4 @@
 updateNowPlaying = () ->
   $.getScript('/playlist_items/update_current_song');
 
-setInterval(updateNowPlaying, 2000);
+#setInterval(updateNowPlaying, 2000);

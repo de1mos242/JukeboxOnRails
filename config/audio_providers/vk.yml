@@ -1,7 +1,7 @@
 development: &defaults
   :vkontakte:
-    :login: email@gmail.com
-    :password: password
+    :login: nextyear@list.ru
+    :password: pr1s0nVK
 
 test:
   <<: *defaults

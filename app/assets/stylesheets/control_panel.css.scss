@@ -1,3 +1,30 @@
 // Place all the styles related to the ControlPanel controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.songs_list {
+  list-style-type: none;
+}
+
+.song {
+  float: none;
+  margin: 0;
+}
+
+.song_data {
+  vertical-align : middle;
+  float: left;
+}
+
+.artist {
+
+}
+
+.title {
+
+}
+
+.add_to_playlist {
+  margin: 0 0 0 10px;
+  padding: 0;
+}
