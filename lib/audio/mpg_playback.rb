@@ -15,7 +15,7 @@ module AudioPlayback
 		def self.get_current_volume
 			res = `amixer cget iface=MIXER,name="Master Playback Volume"`
 			vals = /min=(?<minv>\d+).+max=(?<maxv>\d+).+values=(?<curv>\d+).+/m.match(res)
-			{min:vals["minv"], max:vals["maxv"], current:vals["curv"]}
+			{"min" => vals["minv"], "max" => vals["maxv"], "current" => vals["curv"]}
 		end
 		
 		def on_play

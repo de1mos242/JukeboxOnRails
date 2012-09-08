@@ -8,6 +8,7 @@
     %meta{:content => "De1mos", :name => "author"}
     = stylesheet_link_tag    "application", :media => "all"
     = javascript_include_tag "application"
+    %script{src:"scripts/jquery.tmpl.min.js", type:"text/javascript"}
     = csrf_meta_tags
     = yield(:head)
   %body

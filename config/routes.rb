@@ -13,8 +13,10 @@ JukeboxOnRails::Application.routes.draw do
   match 'songs/find' => 'songs#find', :as => :find_songs
   match 'songs/queue' => 'songs#add_to_playlist', :as => :add_to_playlist
 
-  match "control_panel/index" => 'control_panel#index', as: :control_panel
-
+  match "control_panel" => 'control_panel#index', as: :control_panel
+  match "control_panel/find" => 'control_panel#find', as: :control_panel_find
+  match "control_panel/refresh" => 'control_panel#refresh', as: :control_panel_refresh
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

@@ -1,5 +1,25 @@
 class ControlPanelController < ApplicationController
   def index
+    @songs = Song.downloaded
+    
+    @playlist_items = PlaylistItem.position_sorted
+    @volumes = AudioPlayback::MPGPlayback.get_current_volume
+
+    respond_to do |format|
+      format.html { render :index }
+    end
+  end
+
+  def refresh
+    @playlist_items = PlaylistItem.position_sorted
+    @volumes = AudioPlayback::MPGPlayback.get_current_volume
+    @current_song = Playlist.current_song
+    respond_to do |format|
+      format.json { render :refresh }
+    end
+  end
+
+  def find
     unless params["find_query"].blank?
       finded_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])[0...30]
       @songs = []
@@ -13,8 +33,9 @@ class ControlPanelController < ApplicationController
     else
       @songs = Song.downloaded
     end
-    
-    @playlist_items = PlaylistItem.position_sorted
-    @volumes = AudioPlayback::MPGPlayback.get_current_volume
+
+    respond_to do |format|
+      format.json { render json: @songs }
+    end
   end
 end

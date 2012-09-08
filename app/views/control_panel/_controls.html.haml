@@ -1,6 +1,8 @@
 .container-fluid
   .row-fluid
     .span1
+      %button#refresh-btn.btn.btn-success= "Refresh"
+    .span1
       = form_tag(playlist_stop_path, remote:true) do |form|
         = submit_tag 'stop', class:"btn btn-danger"
     .span1
@@ -8,7 +10,7 @@
         = submit_tag 'skip', class:"btn btn-warning"
     .span4
       = form_tag(change_volume_path, remote:true) do |form|
-        = range_field_tag 'volume', @volumes[:current], in: @volumes[:min]..@volumes[:max]
+        = range_field_tag 'volume', @volumes["current"], in: @volumes['min']..@volumes['max']
         = submit_tag 'change volume'
     .span4
       %div

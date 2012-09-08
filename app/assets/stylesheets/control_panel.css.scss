@@ -7,8 +7,16 @@
 }
 
 .song {
+  $border-radius: 5px;
   float: none;
-  margin: 0;
+  margin: 0 0 10px;
+  padding: 10px;
+  border: 3px solid #86b32d;
+  -moz-border-radius: $border-radius;
+  -webkit-border-radius: $border-radius;
+  border-radius: $border-radius;
+  background-color: #c9f76f;
+
 }
 
 .song_data {
@@ -25,6 +33,5 @@
 }
 
 .add_to_playlist {
-  margin: 0 0 0 10px;
-  padding: 0;
+  padding: 0 2px 0 2px;
 }
