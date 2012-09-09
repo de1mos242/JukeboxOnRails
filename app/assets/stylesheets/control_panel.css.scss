@@ -8,7 +8,9 @@
 
 .song {
   $border-radius: 5px;
+  display: block;
   float: none;
+  // overflow: auto;
   margin: 0 0 10px;
   padding: 10px;
   border: 3px solid #86b32d;
@@ -19,9 +21,13 @@
 
 }
 
+.song_form {
+  margin: 0;
+}
+
 .song_data {
   vertical-align : middle;
-  float: left;
+  // float: left;
 }
 
 .artist {
@@ -34,4 +40,5 @@
 
 .add_to_playlist {
   padding: 0 2px 0 2px;
+  margin: 0 0 0 5px;
 }

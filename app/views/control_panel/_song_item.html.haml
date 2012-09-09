@@ -1,5 +1,5 @@
 %li.song
-  = form_for song_item, url:add_to_playlist_path, remote:true do |f|
+  = form_for song_item, url:add_to_playlist_path, remote:true, html:{class:"song_form"} do |f|
     = f.hidden_field :artist
     = f.hidden_field :title
     = f.hidden_field :url
@@ -7,8 +7,8 @@
       = f.hidden_field :id
     - else
       = f.hidden_field :id, value:"${id}"
+    = f.submit 'add to playlist', class:"btn btn-info add_to_playlist pull-right"
     .song_data
       %span.artist= "#{song_item.artist}"
       %span= " - "
       %span.title= "#{song_item.title}"
-    = f.submit 'add to playlist', class:"btn btn-info add_to_playlist pull-right"
