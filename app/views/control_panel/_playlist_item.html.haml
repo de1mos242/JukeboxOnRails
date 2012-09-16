@@ -1,3 +1,5 @@
-%tr
-  %td= playlist_item.song.artist
-  %td= playlist_item.song.title
+%li.song
+  .song_data
+    %span.artist= playlist_item.song.artist
+    %span= " - "
+    %span.title= playlist_item.song.title

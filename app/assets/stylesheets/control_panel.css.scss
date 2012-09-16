@@ -3,12 +3,13 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .songs_list {
-  list-style-type: none;
+  list-style: none;//inside url(/assets/musical_note.png);
+  margin: 0;
 }
 
 .song {
   $border-radius: 5px;
-  display: block;
+  display: list-item;
   float: none;
   // overflow: auto;
   margin: 0 0 10px;
@@ -31,7 +32,7 @@
 }
 
 .artist {
-
+  font-weight: bold;
 }
 
 .title {
