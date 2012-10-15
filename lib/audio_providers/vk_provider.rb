@@ -50,11 +50,15 @@ module AudioProviders
 			vk_config = Rails.application.config.vk_config[:vkontakte]
 			email = vk_config[:login]
 			pass = vk_config[:password]
-			login_page = "http://vk.com/login.php"
+			login_page = "https://login.vk.com/"
 			
 			conn = Net::HTTP.new(@@site, @@port)
-			params = { m:1, email:email, pass:pass }
+			params = { act:'login', email:email, pass:pass }
 			resp = conn.get("#{login_page}?"+URI.encode_www_form(params))
+
+			conn = Net::HTTP.new(@@site, @@port)
+			resp = conn.get(resp['location'])
+
 			cookie = resp.response['set-cookie']
 			@@login_sid = /remixsid=(?<data>[a-z0-9]+)/.match(resp['Set-Cookie'])['data']
 		end
