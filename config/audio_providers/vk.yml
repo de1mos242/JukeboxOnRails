@@ -1,7 +1,7 @@
 development: &defaults
   :vkontakte:
-    :login: nextyear@list.ru
-    :password: pr1s0nVK
+    :login: vk_mail
+    :password: vk_pass
 
 test:
   <<: *defaults
