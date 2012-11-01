@@ -2,7 +2,7 @@ class ControlPanelController < ApplicationController
   def index
     @songs = Song.downloaded
     
-    @playlist_items = PlaylistItem.position_sorted
+    @playlist_items = PlaylistItem.position_sorted.in_queue
     @volumes = AudioPlayback::MPGPlayback.get_current_volume
 
     respond_to do |format|
