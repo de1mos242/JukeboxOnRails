@@ -7,7 +7,7 @@
       = f.hidden_field :id
     - else
       = f.hidden_field :id, value:"${id}"
-    = f.submit 'add to playlist', class:"btn btn-info add_to_playlist pull-right"
+    = f.submit 'add to playlist', class:"btn add_to_playlist pull-right"
     .song_data
       %span.artist= "#{song_item.artist}"
       %span= " - "

@@ -2,9 +2,16 @@ class PlaylistItem < ActiveRecord::Base
   belongs_to :song
   attr_accessible :position
 
+  serialize :skip_makers, Array
+
   scope :with_song, lambda { |song| {conditions: ['song_id = ?', song.id]} }
   scope :position_sorted, order: "position asc" 
   scope :downloaded, joins(:song).where("songs.filename is not null")
+  scope :in_queue, conditions: "position > 0"
+
+  def self.skips_count_limit
+    1
+  end
   
   def self.add(song)
   	unless PlaylistItem.with_song(song).first.nil?
@@ -19,7 +26,21 @@ class PlaylistItem < ActiveRecord::Base
   	item = PlaylistItem.new
   	item.position = item_position
   	item.song = song
+    item.skip_makers = []
   	item.save
   	item
+  end
+
+  def add_skip_wish(user_data)
+    p "skip_makers #{self.skip_makers}"
+    return 0 if skip_makers.include?(user_data)
+    self.skip_counter += 1
+    self.skip_makers << user_data
+
+    save!
+  end
+
+  def skipped?()
+    self.skip_counter >= self.class.skips_count_limit
   end
 end

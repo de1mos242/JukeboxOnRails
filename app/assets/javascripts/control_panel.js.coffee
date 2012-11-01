@@ -22,7 +22,7 @@ onFindSongs = (response) ->
   $('#songTemplate').tmpl(response).appendTo('#songs_container');
 
 
-setInterval(refreshPage, 2000);
+#setInterval(refreshPage, 2000);
 
 $(() ->
   $("#refresh-btn").click(refreshPage);

@@ -8,17 +8,27 @@
 }
 
 .song {
-  $border-radius: 5px;
+  $border-radius: 3px;
+  $shadow-right: 5px;
+  $shadow-bottom: 5px;
+  $shadow-blur: 20px;
+  $shadow-color: #888;
+
   display: list-item;
   float: none;
-  // overflow: auto;
-  margin: 0 0 10px;
+  overflow: auto;
+  margin: 0 0 15px;
   padding: 10px;
-  border: 3px solid #86b32d;
+
+  // border: 3px solid #B6B6B6;
+  -moz-box-shadow: $shadow-right $shadow-bottom $shadow-blur $shadow-color;
+  -webkit-box-shadow: $shadow-right $shadow-bottom $shadow-blur $shadow-color;
+  box-shadow: $shadow-right $shadow-bottom $shadow-blur $shadow-color;
   -moz-border-radius: $border-radius;
   -webkit-border-radius: $border-radius;
   border-radius: $border-radius;
-  background-color: #c9f76f;
+
+  background-color: #ECECEC;
 
 }
 
@@ -40,6 +50,6 @@
 }
 
 .add_to_playlist {
-  padding: 0 2px 0 2px;
-  margin: 0 0 0 5px;
+  //padding: 0 2px 0 2px;
+  //margin: 0 0 0 5px;
 }

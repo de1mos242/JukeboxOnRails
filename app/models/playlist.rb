@@ -20,7 +20,7 @@ class Playlist
 		unless song.downloaded?
 			song.download do
     			Playlist.refresh unless Playlist.playing?
-  		end
+  			end
 		end
 		Playlist.refresh
 	end	
@@ -44,13 +44,12 @@ class Playlist
 	def self.play_next
 		return if Playlist.playing?
 
-		next_item = PlaylistItem.downloaded.position_sorted.first
+		next_item = PlaylistItem.downloaded.position_sorted.in_queue.first
 		unless next_item.nil?
 			player = AudioPlayback::MPGPlayback.new next_item.song.filename
 			player.play
 			@@current_song = next_item.song
-    		next_item.destroy
-    		Playlist.shift_items
+			Playlist.shift_items
     		wait_for_stop
 		end
 	end
@@ -58,7 +57,11 @@ class Playlist
 	def self.shift_items
 		PlaylistItem.all.each do |item|
 			item.position -= 1
-			item.save
+			if item.position >= 0
+				item.save!
+			else
+				item.destroy
+			end
 		end
 	end
 

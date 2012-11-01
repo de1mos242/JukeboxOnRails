@@ -11,13 +11,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120904130152) do
+ActiveRecord::Schema.define(:version => 20121101173228) do
 
   create_table "playlist_items", :force => true do |t|
     t.integer  "song_id"
     t.integer  "position"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+    t.integer  "skip_counter", :default => 0, :null => false
+    t.text     "skip_makers"
   end
 
   add_index "playlist_items", ["song_id"], :name => "index_playlist_items_on_song_id", :unique => true
