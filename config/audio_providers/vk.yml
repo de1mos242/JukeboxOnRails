@@ -1,0 +1,13 @@
+development: &defaults
+  :vkontakte:
+    :login: vk_mail
+    :password: vk_pass
+
+test:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+production:
+  <<: *defaults
