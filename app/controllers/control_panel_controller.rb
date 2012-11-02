@@ -11,7 +11,7 @@ class ControlPanelController < ApplicationController
   end
 
   def refresh
-    @playlist_items = PlaylistItem.position_sorted
+    @playlist_items = PlaylistItem.position_sorted.in_queue
     @volumes = AudioPlayback::MPGPlayback.get_current_volume
     @current_song = Playlist.current_song
     respond_to do |format|

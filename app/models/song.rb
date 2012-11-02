@@ -34,21 +34,20 @@ class Song < ActiveRecord::Base
   	  filename = download_path.join(short_filename)
   	  url = self.url
   	  song_id = self.id
-  	  puts "\n\n\nstart"
-  	  puts "block: #{block_given?}"
-      Thread.new do
-      	puts "\n\n\nfork"
+  	  puts "download started"
+  	  Thread.new do
+      	puts "fork created"
         open(filename, 'wb') do |dst|
     		  open(url) do |src|
     		    dst.write(src.read)
     		  end
     		end
-    		puts "\n\n\ndownloaded"
+    		puts "#{filename} downloaded"
     		song = Song.find(song_id)
     		song.filename = filename.to_s
     		song.save
-    		puts "\n\n\n#{song.artist} - #{song.title} saved"
-    		puts "block: #{block_given?}"
+    		puts "#{song.artist} - #{song.title} saved"
+    		puts "do block" if block_given?
     		if block_given?
     			yield
     		end

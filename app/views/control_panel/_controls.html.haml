@@ -1,5 +1,11 @@
 .container-fluid
   .row-fluid
+    .span12
+      %div
+        %span= 'Now playing: '
+        %span.alert.alert-success
+          %span#current_song
+  .row-fluid
     .span1
       %button#refresh-btn.btn.btn-success= "Refresh"
     .span1
@@ -11,9 +17,4 @@
     .span4
       = form_tag(change_volume_path, remote:true) do |form|
         = range_field_tag 'volume', @volumes["current"], in: @volumes['min']..@volumes['max']
-        = submit_tag 'change volume'
-    .span4
-      %div
-        %span= 'Now playing: '
-        %span.alert.alert-success
-          %span#current_song
+        = submit_tag 'change volume'    

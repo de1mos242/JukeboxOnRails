@@ -20,12 +20,19 @@ onRefreshResponse = (response) ->
 onFindSongs = (response) ->
   $('#songs_container').empty();
   $('#songTemplate').tmpl(response).appendTo('#songs_container');
-
+  addToPlaylistBlocker();
 
 setInterval(refreshPage, 2000);
 
+addToPlaylistBlocker = () ->
+  $(".add_to_playlist").click(
+    () -> 
+      $(this).hide("slow"));
+
 $(() ->
   $("#refresh-btn").click(refreshPage);
+
+  addToPlaylistBlocker();
 
   $("#find_form").bind("ajax:success", (xhr, data, status) ->
         onFindSongs(data);
