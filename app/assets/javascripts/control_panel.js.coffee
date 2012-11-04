@@ -27,7 +27,7 @@ setInterval(refreshPage, 2000);
 addToPlaylistBlocker = () ->
   $(".add_to_playlist").click(
     () -> 
-      $(this).hide("slow"));
+      $(this).hide("fast"));
 
 $(() ->
   $("#refresh-btn").click(refreshPage);

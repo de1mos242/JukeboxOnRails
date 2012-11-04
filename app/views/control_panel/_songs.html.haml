@@ -1,10 +1,12 @@
 %h1 Songs
 
 = form_tag(control_panel_find_path, class:"form-search", remote:true, :'data-type' => "json", id:'find_form') do |form|
-  = search_field_tag 'find_query', "", class: "search-query find-song"
-  = submit_tag 'find', class: "btn", disable_with: "finding..."
+  .input-append.find-block
+    = search_field_tag 'find_query', "", class: "search-query find-song"
+    = submit_tag 'Search', class: "btn", disable_with: "finding..."
 
 %ul.songs_list#songs_container
   - @songs.each do |song|
-    = render partial: "song_item", object: song   
+    %li{class: "song" + (" downloaded" unless song.filename.blank?).to_s} 
+      = render partial: "song_item", object: song   
         

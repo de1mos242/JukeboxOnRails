@@ -1,5 +1,6 @@
 %script#songTemplate{type:"text/x-jquery-tmpl"}
-  = render partial: "song_item", object: Song.new(artist:"${artist}", title:"${title}", url:"${url}")
+  %li{class: "song {{if filename}}downloaded{{/if}}"} 
+    = render partial: "song_item", object: Song.new(artist:"${artist}", title:"${title}", url:"${url}", filename:"${filename}")
 %script#playlistItemTemplate{type:"text/x-jquery-tmpl"}
   - playlist_item = PlaylistItem.new
   - playlist_item.song = Song.new(artist:"${song.artist}", title:"${song.title}")
