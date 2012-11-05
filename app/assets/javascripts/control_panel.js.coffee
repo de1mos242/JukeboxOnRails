@@ -22,7 +22,7 @@ onFindSongs = (response) ->
   $('#songTemplate').tmpl(response).appendTo('#songs_container');
   addToPlaylistBlocker();
 
-setInterval(refreshPage, 2000);
+setInterval(refreshPage, 1000);
 
 addToPlaylistBlocker = () ->
   $(".add_to_playlist").click(

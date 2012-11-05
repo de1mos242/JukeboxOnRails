@@ -1,60 +1,72 @@
 class Playlist
 	include AudioPlayback
 
-	@@current_song = nil
-	@@has_waiter = false
+	def self.p(str)
+		puts "thread: #{Thread.current} main: #{Thread.main} says: #{str}"
+	end
 
 	def self.refresh
-		@@current_song = nil unless AudioPlayback::MPGPlayback.playing?
-		unless Playlist.playing?
-			Playlist.play_next
-		end
+		p "on refresh"
+		return if playing?
+		p 'do play_next'
+		play_next
 	end
 
 	def self.current_song
-		@@current_song
+		playlist_item = PlaylistItem.current_item.first()
+		playlist_item.song unless playlist_item.nil?
+		nil
+	end
+
+	def self.current_playlist_item
+		PlaylistItem.current_item.first()
 	end
 
 	def self.add_song(song)
 		PlaylistItem.add(song)
 		unless song.downloaded?
 			song.download do
-    			Playlist.refresh unless Playlist.playing?
+    			refresh unless playing?
   			end
 		end
-		Playlist.refresh
+		refresh
 	end	
 
 	def self.playing?
-		AudioPlayback::MPGPlayback.playing?
+		AudioPlayback::GStreamPlayback.playing?
 	end
 
 	def self.skip
-		#return unless Playlist.playing?
-		AudioPlayback::MPGPlayback.stop
-		@@current_song = nil
-		Playlist.refresh
+		p "on skip"
+		AudioPlayback::GStreamPlayback.stop
+		refresh
+		p "skip finished"
 	end
 
 	def self.stop
 		PlaylistItem.destroy_all
-		Playlist.skip
+		skip
 	end
 
 	def self.play_next
-		return if Playlist.playing?
-
+		p "on play_next"
+		return if playing?
+		p "play_next song"
 		next_item = PlaylistItem.downloaded.position_sorted.in_queue.first
 		unless next_item.nil?
-			player = AudioPlayback::MPGPlayback.new next_item.song.filename
-			player.play
-			@@current_song = next_item.song
-			Playlist.shift_items
-    		wait_for_stop
-		end
+			p "next_item found"
+		
+			AudioPlayback::GStreamPlayback.play_file next_item.song.filename do 
+				p "refresh callback from player"
+				refresh
+			end
+			p "shift after play_next"
+			shift_items
+    	end
 	end
 
 	def self.shift_items
+		p "shift elements"
 		PlaylistItem.all.each do |item|
 			item.position -= 1
 			if item.position >= 0
@@ -64,18 +76,4 @@ class Playlist
 			end
 		end
 	end
-
-	def self.wait_for_stop
-		return if @@has_waiter
-		@@has_waiter = true
-		Thread.new do
-			while AudioPlayback::MPGPlayback.playing? do
-				sleep 1
-			end
-			@@has_waiter = false
-			Playlist.refresh
-			Thread.exit
-		end
-	end
-	
 end

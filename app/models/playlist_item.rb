@@ -8,6 +8,7 @@ class PlaylistItem < ActiveRecord::Base
   scope :position_sorted, order: "position asc" 
   scope :downloaded, joins(:song).where("songs.filename is not null")
   scope :in_queue, conditions: "position > 0"
+  scope :current_item, conditions: "position = 0"
 
   def self.skips_count_limit
     1
