@@ -9,8 +9,8 @@ class Playlist
 	end
 
 	def self.current_song
-		playlist_item = PlaylistItem.current_item.first()
-		playlist_item.song unless playlist_item.nil?
+		playlist_item = current_playlist_item
+		return playlist_item.song unless playlist_item.nil?
 		nil
 	end
 
@@ -56,9 +56,9 @@ class Playlist
 				p "refresh callback from player"
 				refresh
 			end
-			p "shift after play_next"
-			shift_items
     	end
+    	p "shift after play_next"
+		shift_items
 	end
 
 	def self.shift_items

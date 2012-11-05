@@ -97,7 +97,7 @@ class PlaylistItemsController < ApplicationController
   end
 
   def change_volume
-    AudioPlayback::MPGPlayback.set_volume(params["volume"])
+    AudioPlayback::GStreamPlayback.set_volume(params["volume"].to_i)
 
     render :nothing => true
   end

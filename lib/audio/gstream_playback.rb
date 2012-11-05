@@ -19,8 +19,8 @@ module AudioPlayback
       instance.stop
     end
 
-    def self.get_volume
-      {"min" => 0, "max" => 100, "current" => instance.volume}
+    def self.get_current_volume
+      {"min" => 0, "max" => 100, "current" => (instance.volume * 100).round}
     end
 
     def self.set_volume(value)
