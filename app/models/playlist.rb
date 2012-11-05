@@ -1,10 +1,6 @@
 class Playlist
 	include AudioPlayback
 
-	def self.p(str)
-		puts "thread: #{Thread.current} main: #{Thread.main} says: #{str}"
-	end
-
 	def self.refresh
 		p "on refresh"
 		return if playing?
@@ -39,7 +35,7 @@ class Playlist
 	def self.skip
 		p "on skip"
 		AudioPlayback::GStreamPlayback.stop
-		refresh
+		#refresh
 		p "skip finished"
 	end
 
@@ -55,7 +51,7 @@ class Playlist
 		next_item = PlaylistItem.downloaded.position_sorted.in_queue.first
 		unless next_item.nil?
 			p "next_item found"
-		
+			p "kick player: #{next_item.position}: #{next_item.song.artist} - #{next_item.song.title}"
 			AudioPlayback::GStreamPlayback.play_file next_item.song.filename do 
 				p "refresh callback from player"
 				refresh
@@ -75,5 +71,7 @@ class Playlist
 				item.destroy
 			end
 		end
+		p "new items:"
+		PlaylistItem.all.each { |item| p "  #{item.position}: #{item.song.artist} - #{item.song.title}" }
 	end
 end
