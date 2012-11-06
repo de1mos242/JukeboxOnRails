@@ -9,6 +9,7 @@ gem 'sqlite3'
 gem 'jquery-rails'
 gem 'haml-rails'
 gem 'bootstrap-sass'
+gem 'nokogiri'
 
 group :audio do
 	gem 'gstreamer'

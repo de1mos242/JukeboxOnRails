@@ -1,5 +1,6 @@
 require 'net/http'
 require 'cgi'
+require 'nokogiri'
 
 module AudioProviders
 
@@ -27,6 +28,9 @@ module AudioProviders
 			track_name_divs = songs.scan(/span class=\"title\" id=\"title.+?\<span class=\"user/)
 			divs = songs.scan(/input type=\"hidden\" id=\"audio_.*\" \/\>/)
 
+			doc = Nokogiri::HTML(songs)
+			durations = doc.css(".duration.fl_r")
+			
 			result = []
 
 			0.upto(divs.size-1) do |i|
@@ -34,13 +38,11 @@ module AudioProviders
 				artist = CGI.unescapeHTML(artist)
 				
 				link = /value=\"(?<url>[^,]+)/.match(divs[i])["url"]
-				test = /\>(\<a.+?\>)?(?<name>.+)\<\/a\>/.match(track_name_divs[i])
 				track_name = /\>(\<a.+?\>)?(?<name>.+)\<span class=\"user/.match(track_name_divs[i])['name'].encode('utf-8', 'windows-1251').gsub(/\<.+?\>/, '')
 				track_name = CGI.unescapeHTML(track_name)
-
-				#puts "#{artist} - #{track_name}"
-
-				result.push({artist:artist,track_name:track_name,url:link})
+				duration = durations[i].content
+			
+				result.push({artist:artist,track_name:track_name,url:link, duration:duration})
 			end
 
 			result

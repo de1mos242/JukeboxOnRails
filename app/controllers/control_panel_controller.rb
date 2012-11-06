@@ -26,7 +26,10 @@ class ControlPanelController < ApplicationController
       finded_songs.each do |song_data|
         song = Song.with_url(song_data[:url]).first
         if song.nil?
-          song = Song.new(artist:song_data[:artist], title:song_data[:track_name], url:song_data[:url])
+          song = Song.new(artist:song_data[:artist], 
+            title:song_data[:track_name], 
+            url:song_data[:url],
+            duration:song_data[:duration])
         end
         @songs.push(song)
       end

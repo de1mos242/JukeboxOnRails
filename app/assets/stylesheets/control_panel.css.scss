@@ -39,6 +39,7 @@
 .song_data {
   vertical-align : middle;
   // float: left;
+  overflow: auto;
 }
 
 .artist {
@@ -64,4 +65,10 @@
 
 .downloaded {
   background-color: #D1FFB3;
+}
+
+.duration {
+  padding-right: 5px;
+  padding-left: 5px;
+  font-weight: bold;
 }

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121101173228) do
+ActiveRecord::Schema.define(:version => 20121106181345) do
 
   create_table "playlist_items", :force => true do |t|
     t.integer  "song_id"
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(:version => 20121101173228) do
     t.datetime "created_at",                      :null => false
     t.datetime "updated_at",                      :null => false
     t.string   "song_hash",  :default => "empty", :null => false
+    t.text     "duration"
   end
 
   add_index "songs", ["artist"], :name => "index_songs_on_artist"

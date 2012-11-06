@@ -60,8 +60,7 @@ class Playlist
 			shift_items
 		else
 			shift_items unless current_playlist_item.nil?
-	    	end
-	    	
+	    end
 	end
 
 	def self.shift_items

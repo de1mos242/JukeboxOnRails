@@ -127,7 +127,7 @@ class SongsController < ApplicationController
       song = Song.find(params[:song][:id])
     else
       user_song = params[:song]
-      song = Song.create(artist:user_song[:artist], title:user_song[:title], url:user_song[:url])
+      song = Song.create(artist:user_song[:artist], title:user_song[:title], url:user_song[:url], duration:user_song[:duration])
     end
     
     Playlist.add_song(song)

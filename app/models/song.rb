@@ -1,7 +1,7 @@
 require "open-uri"
 
 class Song < ActiveRecord::Base
-  attr_accessible :artist, :filename, :title, :url, :song_hash
+  attr_accessible :artist, :filename, :title, :url, :song_hash, :duration
   before_create :fill_song_hash
 
   validate :artist, presents:true

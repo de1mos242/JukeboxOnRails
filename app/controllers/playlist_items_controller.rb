@@ -5,7 +5,7 @@ class PlaylistItemsController < ApplicationController
   # GET /playlist_items.json
   def index
     @playlist_items = PlaylistItem.position_sorted
-    @volumes = AudioPlayback::MPGPlayback.get_current_volume
+    @volumes = AudioPlayback::GStreamPlayback.get_current_volume
 
     respond_to do |format|
       format.html # index.html.erb

@@ -2,12 +2,16 @@
   = f.hidden_field :artist
   = f.hidden_field :title
   = f.hidden_field :url
+  = f.hidden_field :duration
   - unless song_item.id.nil?
     = f.hidden_field :id
   - else
     = f.hidden_field :id, value:"${id}"
   = f.submit 'add to playlist', class:"btn add_to_playlist pull-right"
+  %div
+    %span.duration.pull-right= song_item.duration
   .song_data
-    %span.artist= "#{song_item.artist}"
+    %span.artist= song_item.artist
     %span= " - "
-    %span.title= "#{song_item.title}"
+    %span.title= song_item.title
+
