@@ -14,6 +14,7 @@ class ControlPanelController < ApplicationController
     @playlist_items = PlaylistItem.position_sorted.in_queue
     @volumes = AudioPlayback::GStreamPlayback.get_current_volume
     @current_song = Playlist.current_song
+    @current_position = AudioPlayback::GStreamPlayback.get_position
     respond_to do |format|
       format.json { render :refresh }
     end

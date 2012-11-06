@@ -13,7 +13,7 @@ onRefreshResponse = (response) ->
   $('#playlist_items_container').empty();
   $('#playlistItemTemplate').tmpl(response.playlist_items).appendTo('#playlist_items_container')
   if (response.current_song != null)
-    $("#current_song").html(response.current_song.artist + " - " + response.current_song.title);
+    $("#current_song").html(response.current_song.artist + " - " + response.current_song.title + " " + response.current_position + "/" + response.current_song.duration);
   else
     $("#current_song").empty();
   

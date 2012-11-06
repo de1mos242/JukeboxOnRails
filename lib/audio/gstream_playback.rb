@@ -27,6 +27,10 @@ module AudioPlayback
       instance.volume = value
     end
 
+    def self.get_position
+      instance.current_position
+    end
+
     def self.instance
       p "create new instance" if @instance.nil?
       @instance ||= new
@@ -141,6 +145,15 @@ module AudioPlayback
     def volume=(value)
       prepare unless prepared?
       @volume_control.volume = value/100.0
+    end
+
+    def current_position
+      prepare unless prepared?
+      return nil unless playing?
+      
+      clk = @pipeline.clock.time
+      pos = clk/1000000000.0
+      Time.at(pos).gmtime.strftime('%M:%S')
     end
   end
 

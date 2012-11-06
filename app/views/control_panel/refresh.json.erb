@@ -1,5 +1,6 @@
 {
   "playlist_items": <%= @playlist_items.to_json(include: :song).html_safe %>, 
   "volumes": <%= @volumes.to_json.html_safe %>,
-  "current_song": <%= @current_song.to_json.html_safe %>
+  "current_song": <%= @current_song.to_json.html_safe %>,
+  "current_position": <%= @current_position.to_json.html_safe %>
 }
