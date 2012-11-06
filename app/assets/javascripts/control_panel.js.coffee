@@ -31,6 +31,9 @@ addToPlaylistBlocker = () ->
 
 $(() ->
   $("#refresh-btn").click(refreshPage);
+  $("#clear-btn").click(() ->
+      $("#find_query").val('');
+    );
 
   addToPlaylistBlocker();
 

@@ -3,6 +3,7 @@
 = form_tag(control_panel_find_path, class:"form-search", remote:true, :'data-type' => "json", id:'find_form') do |form|
   .input-append.find-block
     = search_field_tag 'find_query', "", class: "search-query find-song"
+    #clear-btn.btn= "X"
     = submit_tag 'Search', class: "btn", disable_with: "finding..."
 
 %ul.songs_list#songs_container
