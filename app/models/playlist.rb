@@ -56,9 +56,12 @@ class Playlist
 				p "refresh callback from player"
 				refresh
 			end
-    	end
-    	p "shift after play_next"
-		shift_items
+			p "shift after play_next"
+			shift_items
+		else
+			shift_items unless current_playlist_item.nil?
+	    	end
+	    	
 	end
 
 	def self.shift_items
