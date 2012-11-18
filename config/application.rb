@@ -30,6 +30,9 @@ module JukeboxOnRails
     shoutcast_config_path = Rails.root.join("config","audio", "shoutcast.yml")
     config.shoutcast_config = YAML.load_file(shoutcast_config_path)[Rails.env]
 
+    speakers_config_path = Rails.root.join("config","audio", "speakers.yml")
+    config.speakers_config = YAML.load_file(speakers_config_path)[Rails.env]
+
     config.songs_path = Rails.root.join("downloaded_tracks")
 
     # Only load the plugins named here, in the order given (default is alphabetical).

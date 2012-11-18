@@ -44,6 +44,7 @@ module AudioPlayback
       return if prepared?
 
       shoutcast_config = Rails.application.config.shoutcast_config
+      speakers_config = Rails.application.config.speakers_config
 
       @playing = false
       
@@ -60,9 +61,11 @@ module AudioPlayback
 
       @tee = Gst::ElementFactory.make("tee")
 
-      @audiosink_queue = Gst::ElementFactory.make("queue")
+      if speakers_config[:enabled]
+        @audiosink_queue = Gst::ElementFactory.make("queue")
 
-      @audiosink = Gst::ElementFactory.make("autoaudiosink")
+        @audiosink = Gst::ElementFactory.make("autoaudiosink")
+      end
 
       if shoutcast_config[:enabled]
         @shoutcast_queue = Gst::ElementFactory.make("queue")
@@ -83,10 +86,11 @@ module AudioPlayback
         @shoutcast_url = shoutcast_config[:listen_url]
       end
 
-      @pipeline.add(@filesrc, @decoder, @volume_control, @tee, @audiosink_queue, @audiosink)
+      @pipeline.add(@filesrc, @decoder, @volume_control, @tee)
+      @pipeline.add(@audiosink_queue, @audiosink) if speakers_config[:enabled]
       @pipeline.add(@shoutcast_queue, @audioconvert, @lame, @shoutcast) if shoutcast_config[:enabled]
       @filesrc >> @decoder >> @volume_control >> @tee
-      @tee >> @audiosink_queue >> @audiosink
+      @tee >> @audiosink_queue >> @audiosink if speakers_config[:enabled]
       @tee >> @shoutcast_queue >> @audioconvert >> @lame >> @shoutcast if shoutcast_config[:enabled]
 
       @loop = GLib::MainLoop.new(nil, false)

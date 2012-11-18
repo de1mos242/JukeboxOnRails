@@ -1,0 +1,11 @@
+development: &defaults
+  :enabled: false
+
+test:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+production:
+  <<: *defaults
