@@ -4,6 +4,10 @@ class ControlPanelController < ApplicationController
     
     @playlist_items = PlaylistItem.position_sorted.in_queue
     @volumes = AudioPlayback::GStreamPlayback.get_current_volume
+    @shoutcast_url = AudioPlayback::GStreamPlayback.get_shoutcast_url
+    puts "shoutcast_url= #{@shoutcast_url}"
+    puts "shoutcast_url.nil?= #{@shoutcast_url.nil?}"
+    puts "shoutcast_url.blank?= #{@shoutcast_url.blank?}"
 
     respond_to do |format|
       format.html { render :index }

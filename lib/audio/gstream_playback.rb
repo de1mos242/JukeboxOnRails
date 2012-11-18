@@ -31,6 +31,10 @@ module AudioPlayback
       instance.current_position
     end
 
+    def self.get_shoutcast_url
+      instance.shoutcast_url
+    end
+
     def self.instance
       p "create new instance" if @instance.nil?
       @instance ||= new
@@ -39,22 +43,51 @@ module AudioPlayback
     def prepare
       return if prepared?
 
+      shoutcast_config = Rails.application.config.shoutcast_config
+
       @playing = false
       
-      @pipeline = Gst::ElementFactory.make("playbin2")
-      @bin = Gst::Bin.new()
+      @pipeline = Gst::Pipeline.new
+
+      # create a disk reader
+      @filesrc = Gst::ElementFactory.make("filesrc")
+      
+      # now it's time to get the decoder
+      @decoder = Gst::ElementFactory.make("mad")
 
       @volume_control = Gst::ElementFactory.make("volume")
+      @volume_control.volume = 0.5
+
+      @tee = Gst::ElementFactory.make("tee")
+
+      @audiosink_queue = Gst::ElementFactory.make("queue")
+
       @audiosink = Gst::ElementFactory.make("autoaudiosink")
 
-      @bin.add(@volume_control)
-      @bin.add(@audiosink)
-      @volume_control >> @audiosink
+      if shoutcast_config[:enabled]
+        @shoutcast_queue = Gst::ElementFactory.make("queue")
 
-      @bin.add_pad(Gst::GhostPad.new("gpad", @volume_control.get_pad("sink")))
-      @pipeline.audio_sink = @bin
+        @audioconvert = Gst::ElementFactory.make("audioconvert")
+        @lame = Gst::ElementFactory.make("lame")
+        @lame.bitrate = 192
 
-      @volume_control.volume = 0.5
+        # and an audio sink
+        @shoutcast = Gst::ElementFactory.make("shout2send")
+        @shoutcast.ip = shoutcast_config[:ip]
+        @shoutcast.port = shoutcast_config[:port]
+        @shoutcast.password = shoutcast_config[:password]
+        @shoutcast.mount = shoutcast_config[:mount]
+        @shoutcast.sync = shoutcast_config[:sync]
+        @shoutcast.max_lateness = shoutcast_config[:max_lateness]
+
+        @shoutcast_url = shoutcast_config[:listen_url]
+      end
+
+      @pipeline.add(@filesrc, @decoder, @volume_control, @tee, @audiosink_queue, @audiosink)
+      @pipeline.add(@shoutcast_queue, @audioconvert, @lame, @shoutcast) if shoutcast_config[:enabled]
+      @filesrc >> @decoder >> @volume_control >> @tee
+      @tee >> @audiosink_queue >> @audiosink
+      @tee >> @shoutcast_queue >> @audioconvert >> @lame >> @shoutcast if shoutcast_config[:enabled]
 
       @loop = GLib::MainLoop.new(nil, false)
 
@@ -101,7 +134,8 @@ module AudioPlayback
 
     def set_file(filename)
       prepare unless prepared?
-      @pipeline.uri= GLib.filename_to_uri(filename)
+      # @pipeline.uri= GLib.filename_to_uri(filename)
+      @filesrc.location= filename
     end
 
     def play
@@ -154,6 +188,12 @@ module AudioPlayback
       clk = @pipeline.clock.time
       pos = clk/1000000000.0
       Time.at(pos).gmtime.strftime('%M:%S')
+    end
+
+    def shoutcast_url
+      prepare unless prepared?
+      return @shoutcast_url unless @shoutcast_url.blank?
+      nil
     end
   end
 

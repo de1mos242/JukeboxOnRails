@@ -17,4 +17,6 @@
     .span4
       = form_tag(change_volume_path, remote:true) do |form|
         = range_field_tag 'volume', @volumes["current"], in: @volumes['min']..@volumes['max']
-        = submit_tag 'change volume'    
+        = submit_tag 'change volume' 
+    .span4
+      =link_to "Stream", @shoutcast_url unless @shoutcast_url.blank?

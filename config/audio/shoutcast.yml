@@ -1,0 +1,18 @@
+development: &defaults
+  :enabled: true
+  :ip: "127.0.0.1"
+  :port: 8000
+  :password: "hackme"
+  :mount: "stream.mp3"
+  :sync: true
+  :max_lateness: 100000000
+  :listen_url: "http://192.168.25.36:8000/stream.mp3"
+
+test:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+production:
+  <<: *defaults
