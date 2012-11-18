@@ -22,10 +22,11 @@ class Playlist
 		PlaylistItem.add(song)
 		unless song.downloaded?
 			song.download do
-    			refresh unless playing?
+    			refresh
   			end
+  		else
+  			refresh
 		end
-		refresh
 	end	
 
 	def self.playing?
