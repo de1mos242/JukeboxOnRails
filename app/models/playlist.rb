@@ -52,9 +52,12 @@ class Playlist
 		unless next_item.nil?
 			p "next_item found"
 			p "kick player: #{next_item.position}: #{next_item.song.artist} - #{next_item.song.title}"
-			AudioPlayback::GStreamPlayback.play_file next_item.song.filename do 
-				p "refresh callback from player"
-				refresh
+			AudioPlayback::GStreamPlayback.play_song({
+				filename: next_item.song.filename, 
+				artist: next_item.song.artist, 
+				title: next_item.song.title}) do 
+					p "refresh callback from player"
+					refresh
 			end
 			p "shift after play_next"
 			shift_items

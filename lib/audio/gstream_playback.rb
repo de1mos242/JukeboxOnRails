@@ -4,8 +4,9 @@ module AudioPlayback
   
   class GStreamPlayback
 
-    def self.play_file(filename, &on_stop)
-      instance.set_file filename
+    # song = {filename, artist, title}
+    def self.play_song(song, &on_stop)
+      instance.set_song song
       p "run play file"
       instance.set_callback on_stop
       instance.play
@@ -74,6 +75,8 @@ module AudioPlayback
         @lame = Gst::ElementFactory.make("lame")
         @lame.bitrate = 192
 
+        @taginject = Gst::ElementFactory.make("taginject")
+
         # and an audio sink
         @shoutcast = Gst::ElementFactory.make("shout2send")
         @shoutcast.ip = shoutcast_config[:ip]
@@ -88,10 +91,10 @@ module AudioPlayback
 
       @pipeline.add(@filesrc, @decoder, @volume_control, @tee)
       @pipeline.add(@audiosink_queue, @audiosink) if speakers_config[:enabled]
-      @pipeline.add(@shoutcast_queue, @audioconvert, @lame, @shoutcast) if shoutcast_config[:enabled]
+      @pipeline.add(@shoutcast_queue, @audioconvert, @lame, @taginject, @shoutcast) if shoutcast_config[:enabled]
       @filesrc >> @decoder >> @volume_control >> @tee
       @tee >> @audiosink_queue >> @audiosink if speakers_config[:enabled]
-      @tee >> @shoutcast_queue >> @audioconvert >> @lame >> @shoutcast if shoutcast_config[:enabled]
+      @tee >> @shoutcast_queue >> @audioconvert >> @lame >> @taginject >> @shoutcast if shoutcast_config[:enabled]
 
       @loop = GLib::MainLoop.new(nil, false)
 
@@ -136,10 +139,11 @@ module AudioPlayback
       not @prepared.nil?
     end
 
-    def set_file(filename)
+    def set_song(song)
       prepare unless prepared?
       # @pipeline.uri= GLib.filename_to_uri(filename)
-      @filesrc.location= filename
+      @filesrc.location= song[:filename]
+      @taginject.tags = "title=\"#{song[:title]}\",artist=\"#{song[:artist]}\"" unless @taginject.nil?
     end
 
     def play
