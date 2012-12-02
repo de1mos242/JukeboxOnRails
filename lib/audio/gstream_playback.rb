@@ -102,7 +102,7 @@ module AudioPlayback
       bus.add_watch do |bus, message|
         case message.type
           when Gst::Message::EOS
-            p "get eos"
+            p "get eos" if @playing
             do_stop
           when Gst::Message::ERROR
             p "exc in watch: #{message.parse}"
@@ -142,6 +142,7 @@ module AudioPlayback
     def set_song(song)
       prepare unless prepared?
       # @pipeline.uri= GLib.filename_to_uri(filename)
+      @pipeline.stop
       @filesrc.location= song[:filename]
       @taginject.tags = "title=\"#{song[:title]}\",artist=\"#{song[:artist]}\"" unless @taginject.nil?
     end
@@ -171,9 +172,15 @@ module AudioPlayback
     end
 
     def do_stop
-      p "do stop it thread #{Thread.current}  #{self}"
+      p "do stop it thread #{Thread.current}  #{self}" if @playing
       p "no callback on stop!" if @stop_callback.nil?
-      @pipeline.stop
+      p "stop playing #{@filesrc.location}" if @playing
+      unless @playing #just repeat silence
+        @pipeline.seek_simple(Gst::Format::TIME, Gst::Seek::FLAG_FLUSH, 0)
+        @pipeline.play
+        return
+      end
+      play_silence
       @playing = false
       @stop_callback.call unless @stop_callback.nil?
       #@stop_callback = nil
@@ -202,6 +209,12 @@ module AudioPlayback
       prepare unless prepared?
       return @shoutcast_url unless @shoutcast_url.blank?
       nil
+    end
+
+    def play_silence
+      set_song({title: "enjoy the silence", artist: "silence", filename: Rails.root.join("public","empty.mp3").to_s})
+      @pipeline.play
+      p "run silence" if @playing
     end
   end
 
