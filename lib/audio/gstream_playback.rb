@@ -21,7 +21,7 @@ module AudioPlayback
     end
 
     def self.get_current_volume
-      {"min" => 0, "max" => 100, "current" => (instance.volume * 100).round}
+      {"min" => 30, "max" => 100, "current" => (instance.volume * 100).round}
     end
 
     def self.set_volume(value)
@@ -193,7 +193,7 @@ module AudioPlayback
 
     def volume=(value)
       prepare unless prepared?
-      @volume_control.volume = value/100.0
+      @volume_control.volume = [value,self.get_current_volume["min"]].max/100.0
     end
 
     def current_position
