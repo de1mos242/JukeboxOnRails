@@ -85,7 +85,7 @@ class PlaylistItemsController < ApplicationController
   end
 
   def stop
-    Playlist.stop
+    #Playlist.stop
     render :nothing => true
   end
 
