@@ -85,7 +85,7 @@ class PlaylistItemsController < ApplicationController
   end
 
   def stop
-    #Playlist.stop
+    Playlist.stop if params.has_key?(:force)
     render :nothing => true
   end
 
