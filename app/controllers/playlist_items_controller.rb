@@ -91,8 +91,10 @@ class PlaylistItemsController < ApplicationController
 
   def skip
     item = PlaylistItem.find_by_position(0)
-    item.add_skip_wish(session[:session_id])
-    Playlist.skip if item.skipped?
+    if item
+      item.add_skip_wish(session[:session_id])
+      Playlist.skip if item.skipped?
+    end
     render :nothing => true
   end
 

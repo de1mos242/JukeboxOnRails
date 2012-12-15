@@ -28,13 +28,14 @@ class ControlPanelController < ApplicationController
     unless params["find_query"].blank?
       finded_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])[0...30]
       @songs = []
+      p "find songs #{finded_songs.collect {|song_data| song_data[:url]}}"
+      songs_in_cache = Song.where(url: finded_songs.collect {|song_data| song_data[:url]})
       finded_songs.each do |song_data|
-        song = Song.with_url(song_data[:url]).first
+        cached_song = songs_in_cache.select {|s| s.url == song_data[:url]}
+        song = nil
+        song = cached_song[0] if cached_song.size > 0
         if song.nil?
-          song = Song.new(artist:song_data[:artist], 
-            title:song_data[:track_name], 
-            url:song_data[:url],
-            duration:song_data[:duration])
+          song = Song.new(artist:song_data[:artist], title:song_data[:track_name], url:song_data[:url])
         end
         @songs.push(song)
       end

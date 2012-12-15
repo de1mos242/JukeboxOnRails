@@ -61,20 +61,26 @@ class Playlist
 					refresh
 			end
 			p "shift after play_next"
-			shift_items
+			shift_items(next_item)
 		else
 			shift_items unless current_playlist_item.nil?
 	    end
 	end
 
-	def self.shift_items
-		p "shift elements"
-		PlaylistItem.all.each do |item|
-			item.position -= 1
-			if item.position >= 0
+	def self.shift_items(new_play_item = nil)
+		p "shift elements #{new_play_item}"
+		PlaylistItem.where("position <= 0").each {|item| item.destroy }
+		if new_play_item && new_play_item.position > 1
+			item = PlaylistItem.find(new_play_item.id) # prevent read-only record
+			item.position = 0
+			item.save!
+		elsif PlaylistItem.downloaded.size == 0 && PlaylistItem.all.size > 0
+			#do nothing
+			p "we have in downloaded queue"
+		else
+			PlaylistItem.all.each do |item|
+				item.position -= 1
 				item.save!
-			else
-				item.destroy
 			end
 		end
 		p "new items:"
