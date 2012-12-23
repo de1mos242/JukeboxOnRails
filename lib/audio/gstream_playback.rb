@@ -43,19 +43,26 @@ module AudioPlayback
 
     def prepare
       return if prepared?
+      p "prepare started"
 
       shoutcast_config = Rails.application.config.shoutcast_config
       speakers_config = Rails.application.config.speakers_config
 
       @playing = false
-      
+
       @pipeline = Gst::Pipeline.new
 
-      # create a disk reader
+      @fakesrc = Gst::ElementFactory.make("audiotestsrc")
+      @fakesrc.wave = 4 #silence
+      @fake_queue = Gst::ElementFactory.make("queue")
+      @muter = Gst::ElementFactory.make("volume")
+      @muter.volume = 0
+
       @filesrc = Gst::ElementFactory.make("filesrc")
-      
-      # now it's time to get the decoder
+      #@filesrc.location = Rails.root.join("public","empty.mp3").to_s
       @decoder = Gst::ElementFactory.make("mad")
+
+      @adder = Gst::ElementFactory.make("adder")
 
       @volume_control = Gst::ElementFactory.make("volume")
       @volume_control.volume = 0.5
@@ -89,10 +96,14 @@ module AudioPlayback
         @shoutcast_url = shoutcast_config[:listen_url]
       end
 
-      @pipeline.add(@filesrc, @decoder, @volume_control, @tee)
+      #@pipeline.add(@filesrc, @decoder)
+      #@pipeline.add(@fakesrc, @fake_queue, @muter)
+      @pipeline.add(@adder, @volume_control, @tee)
       @pipeline.add(@audiosink_queue, @audiosink) if speakers_config[:enabled]
       @pipeline.add(@shoutcast_queue, @audioconvert, @lame, @taginject, @shoutcast) if shoutcast_config[:enabled]
-      @filesrc >> @decoder >> @volume_control >> @tee
+      #@fakesrc >> @fake_queue >> @muter >> @adder
+      #@filesrc >> @decoder >> @adder
+      @adder >> @volume_control >> @tee
       @tee >> @audiosink_queue >> @audiosink if speakers_config[:enabled]
       @tee >> @shoutcast_queue >> @audioconvert >> @lame >> @taginject >> @shoutcast if shoutcast_config[:enabled]
 
@@ -100,6 +111,7 @@ module AudioPlayback
 
       bus = @pipeline.bus
       bus.add_watch do |bus, message|
+        p "msg #{message.class}" #unless message.class == Gst::MessageTag
         case message.type
           when Gst::Message::EOS
             p "get eos" if @playing
@@ -108,7 +120,10 @@ module AudioPlayback
             p "exc in watch: #{message.parse}"
             do_stop
           when Gst::Message::STATE_CHANGED
-            #p "state changed: #{message.parse}"
+            p "changed state to: #{@pipeline.get_state.to_s}"
+          when Gst::Message::STREAM_STATUS
+            p "get stream event: #{message.structure["type"].name}"
+            do_stop if message.structure["type"].name == "GST_STREAM_STATUS_TYPE_LEAVE"
         end
         #p "get message #{message}"
         true
@@ -131,8 +146,8 @@ module AudioPlayback
         end
       end
       p "from #{Thread.current} created #{@play_thread}"
-
-      @prepared = true;
+      @prepared = true
+      @pipeline.ready
     end
 
     def prepared?
@@ -141,17 +156,30 @@ module AudioPlayback
 
     def set_song(song)
       prepare unless prepared?
-      # @pipeline.uri= GLib.filename_to_uri(filename)
-      @pipeline.stop
-      @filesrc.location= song[:filename]
+      p "set song #{song[:title]}"
+      p "create new source #{song[:filename]}"
+
+      @pipeline.pause
+      @pipeline.seek_simple(Gst::Format::TIME, Gst::Seek::FLAG_FLUSH, 0)
+
+      @filesrc.location = song[:filename]
+
+      @pipeline.add(@filesrc, @decoder)
+      @decoder.link(@adder)
+      @filesrc.link(@decoder)
+      @decoder.sync_state_with_parent
+      @filesrc.sync_state_with_parent
       @taginject.tags = "title=\"#{song[:title]}\",artist=\"#{song[:artist]}\"" unless @taginject.nil?
     end
 
     def play
       prepare unless prepared?
       p "start playing"
-      @playing = true
+      p "playing state: #{@pipeline.get_state.to_s}"
       @pipeline.play
+      p "playing state: #{@pipeline.get_state.to_s}"
+
+      @playing = true
     end
 
     def playing?
@@ -175,15 +203,28 @@ module AudioPlayback
       p "do stop it thread #{Thread.current}  #{self}" if @playing
       p "no callback on stop!" if @stop_callback.nil?
       p "stop playing #{@filesrc.location}" if @playing
-      unless @playing #just repeat silence
-        @pipeline.seek_simple(Gst::Format::TIME, Gst::Seek::FLAG_FLUSH, 0)
+      p "prev state #@waiting_eof"
+      unless @waiting_eof
+        @pipeline.pause
+        @taginject.tags = "title=\"enjoy the silence\",artist=\"silence\"" unless @taginject.nil?
+        unless @filesrc.nil?
+          p "remove old source #{@filesrc.location}"
+          @filesrc.unlink(@decoder)
+          @decoder.unlink(@adder)
+          @pipeline.remove(@decoder, @filesrc)
+          @filesrc.stop
+          @decoder.stop
+          @waiting_eof = true
+        end
+
         @pipeline.play
-        return
+
+        @playing = false
+
+        @stop_callback.call unless @stop_callback.nil?
+      else
+        @waiting_eof = false
       end
-      play_silence
-      @playing = false
-      @stop_callback.call unless @stop_callback.nil?
-      #@stop_callback = nil
     end
 
     def volume
@@ -199,7 +240,7 @@ module AudioPlayback
     def current_position
       prepare unless prepared?
       return nil unless playing?
-      
+
       clk = @pipeline.clock.time
       pos = clk/1000000000.0
       Time.at(pos).gmtime.strftime('%M:%S')
@@ -211,11 +252,6 @@ module AudioPlayback
       nil
     end
 
-    def play_silence
-      set_song({title: "enjoy the silence", artist: "silence", filename: Rails.root.join("public","empty.mp3").to_s})
-      @pipeline.play
-      p "run silence" if @playing
-    end
   end
 
 end
