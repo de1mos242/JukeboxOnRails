@@ -28,8 +28,16 @@ end
 
 after 'deploy:update_code', :roles => :app do
   # Здесь для примера вставлен только один конфиг с приватными данными - database.yml. Обычно для таких вещей создают папку /srv/myapp/shared/config и кладут файлы туда. При каждом деплое создаются ссылки на них в нужные места приложения.
-  run "rm -f #{current_release}/config/database.yml"
-  run "ln -s #{deploy_to}/shared/config/database.yml #{current_release}/config/database.yml"
+  store_configs = {}
+  store_configs["database.yml"] = "/config/database.yml"
+  store_configs["shoutcast.yml"] = "/config/audio/shoutcast.yml"
+  store_configs["speakers.yml"] = "/config/audio/speakers.yml"
+  store_configs["common.yml"] = "/config/audio/common.yml"
+  store_configs["vk.yml"] = "/config/audio_providers/vk.yml"
+  store_configs.each do |config_filename, destination|
+  	run "rm -f #{current_release}#{destination}"
+  	run "ln -s #{deploy_to}/shared/config/#{config_filename} #{current_release}#{destination}"
+  end
 end
 
 # Далее идут правила для перезапуска unicorn. Их стоит просто принять на веру - они работают.
