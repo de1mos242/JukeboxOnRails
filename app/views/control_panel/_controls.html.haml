@@ -9,6 +9,9 @@
     .span1
       %button#refresh-btn.btn.btn-success= "Refresh"
     .span1
+      = form_tag(playlist_stop_path, remote:true) do |form|
+        = submit_tag 'stop', class:"btn btn-danger"
+    .span1
       = form_tag(playlist_skip_path, remote:true) do |form|
         = submit_tag 'skip', class:"btn btn-warning"
     .span4
