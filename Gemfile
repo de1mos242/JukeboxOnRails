@@ -36,6 +36,11 @@ gem 'jquery-rails'
 # To use Jbuilder templates for JSON
 # gem 'jbuilder'
 
+group :development do
+  gem 'capistrano'
+  gem "rvm-capistrano"
+end
+
 group :production do
   gem "pg"
   gem 'unicorn'
