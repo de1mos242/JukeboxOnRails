@@ -1,0 +1,11 @@
+development: &defaults
+  skip_counter: 1
+
+test:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+production:
+  <<: *defaults

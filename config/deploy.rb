@@ -22,6 +22,10 @@ role :db,  domain, :primary => true
 
 before 'deploy:setup', 'rvm:install_rvm', 'rvm:install_ruby' # интеграция rvm с capistrano настолько хороша, что при выполнении cap deploy:setup установит себя и указанный в rvm_ruby_string руби.
 
+after 'deploy:setup', :roles => :app do
+	run "mkdir -p #{deploy_to}/shared/config"
+end
+
 after 'deploy:update_code', :roles => :app do
   # Здесь для примера вставлен только один конфиг с приватными данными - database.yml. Обычно для таких вещей создают папку /srv/myapp/shared/config и кладут файлы туда. При каждом деплое создаются ссылки на них в нужные места приложения.
   run "rm -f #{current_release}/config/database.yml"

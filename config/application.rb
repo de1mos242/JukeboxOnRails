@@ -33,6 +33,9 @@ module JukeboxOnRails
     speakers_config_path = Rails.root.join("config","audio", "speakers.yml")
     config.speakers_config = YAML.load_file(speakers_config_path)[Rails.env]
 
+    common_audio_config_path = Rails.root.join("config","audio", "common.yml")
+    config.common_audio_config = YAML.load_file(common_audio_config_path)[Rails.env]
+
     config.songs_path = Rails.root.join("downloaded_tracks")
 
     # Only load the plugins named here, in the order given (default is alphabetical).
