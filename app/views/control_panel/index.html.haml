@@ -1,3 +1,6 @@
+:javascript
+  var long_poll_server_url = '#{@long_poll_server}'
+
 %script#songTemplate{type:"text/x-jquery-tmpl"}
   %li{class: "song {{if filename}}downloaded{{/if}}"} 
     = render partial: "song_item", object: Song.new(artist:"${artist}", title:"${title}", url:"${url}", filename:"${filename}", duration:"${duration}")

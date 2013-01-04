@@ -11,7 +11,7 @@ class PlaylistItem < ActiveRecord::Base
   scope :current_item, conditions: "position = 0"
 
   def self.skips_count_limit
-    Rails.application.config.common_audio_config[:skip_counter]
+    Rails.application.config.common_audio_config[:skip_counter].to_i
   end
   
   def self.add(song)
@@ -44,4 +44,11 @@ class PlaylistItem < ActiveRecord::Base
   def skipped?()
     self.skip_counter >= self.class.skips_count_limit
   end
+
+  def self.current_song
+    item = current_item.first()
+    return item.song unless item.nil?
+    nil
+  end
+
 end

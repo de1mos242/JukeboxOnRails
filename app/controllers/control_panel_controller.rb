@@ -1,7 +1,8 @@
 class ControlPanelController < ApplicationController
   def index
     @songs = Song.downloaded
-    
+    p "#{Rails.application.config.common_audio_config}"
+    @long_poll_server = Rails.application.config.common_audio_config[:long_poll_server]
     @playlist_items = PlaylistItem.position_sorted.in_queue
     @volumes = AudioPlayback::GStreamPlayback.get_current_volume
     @shoutcast_url = AudioPlayback::GStreamPlayback.get_shoutcast_url

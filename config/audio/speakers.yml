@@ -1,5 +1,5 @@
 development: &defaults
-  :enabled: false
+  :enabled: true
 
 test:
   <<: *defaults
