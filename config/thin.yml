@@ -1,0 +1,13 @@
+---
+environment: production
+socket: /var/www/JukeboxOnRails/shared/thin.sock
+timeout: 30
+log: /var/www/JukeboxOnRails/shared/log/thin.log
+pid: /var/www/JukeboxOnRails/shared/pids/thin.pid
+max_conns: 1024
+max_persistent_conns: 100
+require: []
+wait: 30
+rackup: ./config/long_poll_config.ru
+servers: 3
+daemonize: true

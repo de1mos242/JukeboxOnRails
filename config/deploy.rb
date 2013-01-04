@@ -8,6 +8,8 @@ set :deploy_to, "/var/www/#{application}"
 set :use_sudo, false
 set :unicorn_conf, "#{deploy_to}/current/config/unicorn.rb"
 set :unicorn_pid, "#{deploy_to}/shared/pids/unicorn.pid"
+set :thin_conf, "#{deploy_to}/current/config/thin.yml"
+set :thin_pid, "#{deploy_to}/shared/pids/thin.pid"
 
 set :rvm_ruby_string, 'ruby-1.9.3' # Это указание на то, какой Ruby интерпретатор мы будем использовать.
 
@@ -40,16 +42,17 @@ after 'deploy:update_code', :roles => :app do
   end
 end
 
-# Далее идут правила для перезапуска unicorn. Их стоит просто принять на веру - они работают.
-# В случае с Rails 3 приложениями стоит заменять bundle exec unicorn_rails на bundle exec unicorn
 namespace :deploy do
   task :restart do
-    run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -USR2 `cat #{unicorn_pid}`; else cd #{deploy_to}/current && bundle exec unicorn_rails -c #{unicorn_conf} -E #{rails_env} -D; fi"
+    run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -USR2 `cat #{unicorn_pid}`; else cd #{deploy_to}/current && bundle exec unicorn -c #{unicorn_conf} -E #{rails_env} -D; fi"
+    run "if [ -f #{thin_pid} ] && [ -e /proc/$(cat #{thin_pid}) ]; then kill -QUIT `cat #{thin_pid}`; fi ; bundle exec thin -C #{thin_conf}"
   end
   task :start do
-    run "bundle exec unicorn_rails -c #{unicorn_conf} -E #{rails_env} -D"
+    run "bundle exec unicorn -c #{unicorn_conf} -E #{rails_env} -D"
+    run "bundle exec thin -C #{thin_conf}"
   end
   task :stop do
     run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -QUIT `cat #{unicorn_pid}`; fi"
+    run "if [ -f #{thin_pid} ] && [ -e /proc/$(cat #{thin_pid}) ]; then kill -QUIT `cat #{thin_pid}`; fi"
   end
 end
