@@ -92,7 +92,7 @@ class LongPollController < Sinatra::Base
         p "request_time: #{request_time}"
         pollster = proc do
           time = 0
-          until time > 10
+          until time > 120
             break if @@changed_time > request_time
             sleep 0.5
             time += 0.5
