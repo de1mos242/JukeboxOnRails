@@ -9,5 +9,5 @@ max_persistent_conns: 100
 require: []
 wait: 30
 rackup: ./config/long_poll_config.ru
-servers: 3
+servers: 1
 daemonize: true
