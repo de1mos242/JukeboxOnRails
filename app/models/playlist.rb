@@ -22,6 +22,7 @@ class Playlist
 		PlaylistItem.add(song)
 		unless song.downloaded?
 			song.download do
+				p "downloaded and refresh"
     			refresh
   			end
   		else

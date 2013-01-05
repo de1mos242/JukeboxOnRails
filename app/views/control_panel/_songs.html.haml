@@ -7,7 +7,7 @@
     = submit_tag 'Search', class: "btn", disable_with: "finding..."
 
 %ul.songs_list#songs_container
-  - @songs.each do |song|
-    %li{class: "song" + (" downloaded" unless song.filename.blank?).to_s} 
-      = render partial: "song_item", object: song   
+  /- @songs.each do |song|
+  /  %li{class: "song" + (" downloaded" unless song.filename.blank?).to_s} 
+  /    = render partial: "song_item", object: song   
         
