@@ -18,6 +18,7 @@ module MessageQueue
 				end
 			rescue Exception => e
 				puts "Hustron, some common problems: #{e}"
+				puts "Backtrace: #{e.}"
 				EventMachine.stop if EM.reactor_running? && !event_machine_was_running
 			end
 
