@@ -100,5 +100,6 @@ begin
 	end
 rescue Exception => e
 	puts "Hustron, some common problems: #{e}"
+	puts "Backtrace: #{e.backtrace}"
 	EventMachine.stop if EventMachine.reactor_running?
 end
