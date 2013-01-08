@@ -37,6 +37,7 @@ after 'deploy:update_code', :roles => :app do
   store_configs["common.yml"] = "/config/audio/common.yml"
   store_configs["vk.yml"] = "/config/audio_providers/vk.yml"
   store_configs['mq.yml'] = "/config/mq.yml"
+  store_configs['player.god'] = "/script/god/player.god"
   store_configs.each do |config_filename, destination|
   	run "rm -f #{current_release}#{destination}"
   	run "ln -s #{deploy_to}/shared/config/#{config_filename} #{current_release}#{destination}"
