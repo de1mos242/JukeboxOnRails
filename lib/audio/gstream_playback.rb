@@ -1,4 +1,5 @@
 require 'gst'
+require 'yaml'
 
 module AudioPlayback
   
@@ -44,8 +45,10 @@ module AudioPlayback
     def prepare
       return if prepared?
 
-      shoutcast_config = Rails.application.config.shoutcast_config
-      speakers_config = Rails.application.config.speakers_config
+      @rails_root = File.expand_path('../../..', __FILE__)
+      env = ENV['RACK_ENV'] || 'development'
+      shoutcast_config = YAML.load(File.read(File.join(@rails_root, "config", "audio", "shoutcast.yml")))[env]
+      speakers_config = YAML.load(File.read(File.join(@rails_root, "config", "audio", "speakers.yml")))[env]
 
       @playing = false
       
@@ -212,7 +215,7 @@ module AudioPlayback
     end
 
     def play_silence
-      set_song({title: "enjoy the silence", artist: "silence", filename: Rails.root.join("public","empty.mp3").to_s})
+      set_song({title: "enjoy the silence", artist: "silence", filename: File.join(@rails_root,"public","empty.mp3").to_s})
       @pipeline.play
       p "run silence" if @playing
     end

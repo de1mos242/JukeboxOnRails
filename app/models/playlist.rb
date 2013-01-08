@@ -1,6 +1,6 @@
 class Playlist
 	include AudioPlayback
-
+	
 	def self.refresh
 		p "on refresh"
 		return if playing?
@@ -21,10 +21,7 @@ class Playlist
 	def self.add_song(song)
 		PlaylistItem.add(song)
 		unless song.downloaded?
-			song.download do
-				p "downloaded and refresh"
-    			refresh
-  			end
+			song.download
   		else
   			refresh
 		end
@@ -36,7 +33,7 @@ class Playlist
 
 	def self.skip
 		p "on skip"
-		AudioPlayback::GStreamPlayback.stop
+		AudioPlayback::GStreamPlayback.stop if playing?
 		#refresh
 		p "skip finished"
 	end
@@ -60,7 +57,7 @@ class Playlist
 				title: next_item.song.title}) do 
 					p "refresh callback from player"
 					refresh
-			end
+				end
 			p "shift after play_next"
 			shift_items(next_item)
 		else

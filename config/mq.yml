@@ -1,0 +1,15 @@
+development: &defaults
+  :location: "127.0.0.1"
+  :vhost: "test"
+  :user: "t1"
+  :pass: "t2"
+  :entities_prefix: "t1"
+
+test:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+production:
+  <<: *defaults

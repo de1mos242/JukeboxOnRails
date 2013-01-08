@@ -1,5 +1,6 @@
 class PlaylistItemsController < ApplicationController
   include AudioPlayback 
+  require 'base_queue'
 
   # GET /playlist_items
   # GET /playlist_items.json
@@ -85,7 +86,7 @@ class PlaylistItemsController < ApplicationController
   end
 
   def stop
-    Playlist.stop if params.has_key?(:force)
+    MessageQueue::BaseQueue.SendBroadcastMessage("playlist.stop",{},"stop please") if params.has_key?(:force)
     render :nothing => true
   end
 
@@ -93,13 +94,16 @@ class PlaylistItemsController < ApplicationController
     item = PlaylistItem.find_by_position(0)
     if item
       item.add_skip_wish(session[:session_id])
-      Playlist.skip if item.skipped?
+      if item.skipped?
+        p "send skip message"
+        MessageQueue::BaseQueue.SendBroadcastMessage("playlist.skip",{},"skip please") 
+      end
     end
     render :nothing => true
   end
 
   def change_volume
-    AudioPlayback::GStreamPlayback.set_volume(params["volume"].to_i)
+    #AudioPlayback::GStreamPlayback.set_volume(params["volume"].to_i)
 
     render :nothing => true
   end

@@ -2,6 +2,7 @@ class SongsController < ApplicationController
 
   include AudioPlayback   
   include AudioProviders
+  require 'base_queue'
 
   # GET /songs
   # GET /songs.json
@@ -132,7 +133,8 @@ class SongsController < ApplicationController
       song = Song.create(artist:user_song[:artist], title:user_song[:title], url:user_song[:url], duration:user_song[:duration])
     end
     
-    Playlist.add_song(song)
+    MessageQueue::BaseQueue.SendBroadcastMessage("playlist.add.song", {}, song.id)
+    #Playlist.add_song(song)
     render :nothing => true
   end
 end

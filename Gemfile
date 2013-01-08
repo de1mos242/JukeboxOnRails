@@ -33,6 +33,8 @@ gem 'jquery-rails'
 gem 'thin'
 gem "eventmachine"
 gem 'async_sinatra'
+gem 'amqp'
+gem 'god'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

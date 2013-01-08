@@ -36,6 +36,7 @@ after 'deploy:update_code', :roles => :app do
   store_configs["speakers.yml"] = "/config/audio/speakers.yml"
   store_configs["common.yml"] = "/config/audio/common.yml"
   store_configs["vk.yml"] = "/config/audio_providers/vk.yml"
+  store_configs['mq.yml'] = "/config/mq.yml"
   store_configs.each do |config_filename, destination|
   	run "rm -f #{current_release}#{destination}"
   	run "ln -s #{deploy_to}/shared/config/#{config_filename} #{current_release}#{destination}"
@@ -46,13 +47,16 @@ namespace :deploy do
   task :restart do
     run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -USR2 `cat #{unicorn_pid}`; else cd #{deploy_to}/current && bundle exec unicorn_rails -c #{unicorn_conf} -E #{rails_env} -D; fi"
     run "cd #{deploy_to}/current && bundle exec thin restart -C #{thin_conf}"
+    run "cd #{deploy_to}/current && god restart jukebox_player"
   end
   task :start do
     run "cd #{deploy_to}/current && bundle exec unicorn_rails -c #{unicorn_conf} -E #{rails_env} -D"
     run "cd #{deploy_to}/current && bundle exec thin start -C #{thin_conf}"
+    run "cd #{deploy_to}/current && god -c script/god/player.god"
   end
   task :stop do
     run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -QUIT `cat #{unicorn_pid}`; fi"
     run "cd #{deploy_to}/current && bundle exec thin stop -C #{thin_conf}"
+    run "cd #{deploy_to}/current && god stop jukebox_player"
   end
 end
