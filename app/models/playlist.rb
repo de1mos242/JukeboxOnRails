@@ -22,7 +22,7 @@ class Playlist
 	def self.add_song(song)
 		PlaylistItem.add(song)
 		unless song.downloaded?
-			EM.defer(song.download, refresh.to_proc)
+			EM.defer(song.download, Proc.new {|result| refresh})
   		else
   			refresh
 		end
