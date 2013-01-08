@@ -1,6 +1,7 @@
 development: &defaults
   :skip_counter: 1
   :long_poll_server: "http://localhost:2000/refresh"
+  :songs_path: "downloaded_tracks"
 
 test:
   <<: *defaults

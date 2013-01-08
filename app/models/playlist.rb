@@ -1,3 +1,4 @@
+require 'eventmachine'
 class Playlist
 	include AudioPlayback
 	
@@ -21,7 +22,7 @@ class Playlist
 	def self.add_song(song)
 		PlaylistItem.add(song)
 		unless song.downloaded?
-			song.download
+			EM.defer(song.download, refresh)
   		else
   			refresh
 		end
