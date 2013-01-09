@@ -59,5 +59,6 @@ namespace :deploy do
     run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -QUIT `cat #{unicorn_pid}`; fi"
     run "cd #{deploy_to}/current && bundle exec thin stop -C #{thin_conf}"
     run "cd #{deploy_to}/current && god stop jukebox_player"
+    run "cd #{deploy_to}/current && god quit"
   end
 end
