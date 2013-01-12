@@ -22,7 +22,17 @@ class Playlist
 	def self.add_song(song)
 		PlaylistItem.add(song)
 		unless song.downloaded?
-			EM.defer(Proc.new {song.download}, Proc.new {|result| refresh})
+			start_download = Proc.new do 
+				puts "#{song.artist} - #{song.title} run async download"
+				song.download
+			end
+			on_download = Proc.new do |filename|
+				puts "#{song.artist} - #{song.title} #{filename} downloaded callback"
+				song.filename = filename
+				song.save!
+				refresh
+			end
+			EM.defer(start_download, on_download)
   		else
   			refresh
 		end

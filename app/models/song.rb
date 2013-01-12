@@ -43,10 +43,7 @@ class Song < ActiveRecord::Base
 		    dst.write(src.read)
 		  end
 		end
-		puts "#{filename} downloaded"
-		song = Song.find(song_id)
-		song.filename = filename.to_s
-		song.save
-		puts "#{song.artist} - #{song.title} saved"
+    puts "#{artist} - #{title} #{filename} downloaded"
+    filename
   end
 end
