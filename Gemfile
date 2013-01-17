@@ -10,6 +10,7 @@ gem 'jquery-rails'
 gem 'haml-rails'
 gem 'bootstrap-sass'
 gem 'nokogiri'
+gem 'therubyracer'
 
 group :audio do
 	gem 'gstreamer'
