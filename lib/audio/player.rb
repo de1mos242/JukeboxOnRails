@@ -1,4 +1,4 @@
-RAILS_ROOT = File.expand_path('../../..', __FILE__)
+rails_root = File.expand_path('../../..', __FILE__)
 require "rubygems"
 require "amqp"
 require 'yaml'
@@ -7,16 +7,16 @@ require 'active_record'
 require 'active_support/all'
 require 'active_support/json'
 
-require "#{RAILS_ROOT}/lib/audio/playback_base"
-require "#{RAILS_ROOT}/lib/audio/gstream_playback"
+require "#{rails_root}/lib/audio/playback_base"
+require "#{rails_root}/lib/audio/gstream_playback"
 
-require "#{RAILS_ROOT}/lib/mq/base_queue"
+require "#{rails_root}/lib/mq/base_queue"
 
-require "#{RAILS_ROOT}/app/models/playlist_item"
-require "#{RAILS_ROOT}/app/models/song"
-require "#{RAILS_ROOT}/app/models/playlist"
+require "#{rails_root}/app/models/playlist_item"
+require "#{rails_root}/app/models/song"
+require "#{rails_root}/app/models/playlist"
 
-db_config = YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'database.yml'))).with_indifferent_access
+db_config = YAML.load(File.read(File.join(rails_root, 'config', 'database.yml'))).with_indifferent_access
 ActiveRecord::Base.include_root_in_json = false
 ActiveRecord::Base.configurations = db_config
 ActiveRecord::Base.establish_connection(ENV['RACK_ENV'] || 'development')
@@ -42,15 +42,21 @@ def on_add_song(song_id)
 	Playlist.add_song(song)
 end
 
+def push_to_longpoll(channel, exchange_prefix)
+  exchange = channel.fanout("#{exchange_prefix}.longpoll.refresh")
+
+end
+
 begin
-	Playlist.refresh
-	AMQP.start(host: credentials[:location], 
+	AMQP.start(host: credentials[:location],
 			user: credentials[:user], 
 			pass: credentials[:pass], 
 			vhost: credentials[:vhost]
 			) do |connection|
 
-		connection.on_error do |conn, connection_close|
+    Playlist.refresh
+
+    connection.on_error do |conn, connection_close|
 	      puts <<-ERR
 	      Handling a connection-level exception.
 	 
@@ -99,7 +105,7 @@ begin
 		end
 	end
 rescue Exception => e
-	puts "Hustron, some common problems: #{e}"
+	puts "Huston, some common problems: #{e}"
 	puts "Backtrace: #{e.backtrace}"
 	EventMachine.stop if EventMachine.reactor_running?
 end

@@ -1,12 +1,38 @@
+rails_root = File.expand_path('../../..', __FILE__)
 require 'eventmachine'
+require "#{rails_root}/lib/mq/base_queue"
 class Playlist
 	include AudioPlayback
+
+  def self.get_data
+    data = {}
+    data[:playlist_items] = PlaylistItem.position_sorted.in_queue.all
+    data[:current_song] = PlaylistItem.current_song
+    data
+  end
+
+  def self.prepare_longpoll_message(timestamp)
+    new_data = get_data
+    result = '{'
+    result += "\"playlist_items\": #{new_data[:playlist_items].to_json(include: {song: {only: [:artist, :title, :duration]}}).html_safe},"
+    result += "\"current_song\": #{new_data[:current_song].to_json(only: [:artist, :title, :duration]).html_safe},"
+    result += "\"last_update\": \"#{timestamp}\""
+    result += '}'
+    result
+  end
+
+  def self.push_to_longpoll
+    update_ts = Time.now.to_r.to_s
+    MessageQueue::BaseQueue.SendBroadcastMessage("longpoll.refresh", {update_ts: update_ts}, prepare_longpoll_message(update_ts))
+  end
 	
 	def self.refresh
 		p "on refresh"
-		return if playing?
-		p 'do play_next'
-		play_next
+		unless playing?
+		  p 'do play_next'
+		  play_next
+    end
+    push_to_longpoll
 	end
 
 	def self.current_song
@@ -94,5 +120,6 @@ class Playlist
 		end
 		p "new items:"
 		PlaylistItem.all.each { |item| p "  #{item.position}: #{item.song.artist} - #{item.song.title}" }
-	end
+  end
+
 end

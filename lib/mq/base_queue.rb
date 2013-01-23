@@ -24,7 +24,7 @@ module MessageQueue
 
 			#EM.add_timer(3) {EM.stop}
 			#end
-	  	end
+	  end
 
 		def self.load_credentials
 			rails_root = File.expand_path('../../..', __FILE__)
@@ -67,7 +67,37 @@ module MessageQueue
 			end
 		end
 
+    # Required to be running in EventMachine
+    def self.Listen(exchange_name, callback)
+      credentials = load_credentials
+      AMQP.connect(host: credentials[:location],
+                   user: credentials[:user],
+                   pass: credentials[:pass],
+                   vhost: credentials[:vhost]
+      ) do |connection|
+        p "connected to amqp"
+        connection.on_error do |conn, connection_close|
+          puts <<-ERR
+			      Handling a connection-level exception.
 
+			      AMQP class id : #{connection_close.class_id},
+			      AMQP method id: #{connection_close.method_id},
+			      Status code   : #{connection_close.reply_code}
+			      Error message : #{connection_close.reply_text}
+          ERR
+        end
+        channel = AMQP::Channel.new(connection)
+        channel.on_error do |ch, close|
+          puts "Huston, channel problems: #{close.reply_text}, #{close.inspect}"
+        end
+        exchange = channel.fanout("#{credentials[:entities_prefix]}.#{exchange_name}")
+        p "reveiving messages from #{credentials[:entities_prefix]}.#{exchange_name}..."
+        channel.queue("#{credentials[:entities_prefix]}.#{exchange_name}.queue", auto_delete:true).bind(exchange).subscribe do |metadata, payload|
+          p "get message from #{exchange_name}"
+          callback.call(payload, metadata)
+        end
+      end
+    end
 
 
 

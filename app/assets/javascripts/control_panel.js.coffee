@@ -5,6 +5,7 @@
 current_song = null;
 current_song_timer = 0;
 prevous_song = null;
+last_update = null;
 
 refreshPage = (request_data) ->
   request = $.ajax({
@@ -22,13 +23,14 @@ refreshPage = (request_data) ->
   request.error(onRefreshResponseFailure);
   
 onRefreshResponse = (response) ->
-  if (!response.hasOwnProperty('noData'))
+  if (typeof response != "undefined" && response != null && response.hasOwnProperty('current_song'))
     $('#playlist_items_container').empty();
     if (response.playlist_items != null && response.playlist_items.length > 0)
       $('#playlistItemTemplate').tmpl(response.playlist_items).appendTo('#playlist_items_container')
     current_song = response.current_song;
     refreshCurrentSong();
-  refreshPage({"last_update" : response.last_update});
+    last_update = response.last_update
+  refreshPage({"last_update" : last_update});
 
 onRefreshResponseFailure = () ->
   setTimeout(refreshPage(null), 2000);
