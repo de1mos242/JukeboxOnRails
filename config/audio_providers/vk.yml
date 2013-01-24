@@ -1,7 +1,6 @@
 development: &defaults
-  :vkontakte:
-    :login: vk_mail
-    :password: vk_pass
+  :app_id: "app_id"
+  :app_secret: "app_secret"
 
 test:
   <<: *defaults
