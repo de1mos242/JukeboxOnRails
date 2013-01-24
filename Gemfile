@@ -39,6 +39,7 @@ gem 'god'
 
 gem 'devise'
 gem 'omniauth-vkontakte'
+gem 'vkontakte_api'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

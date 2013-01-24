@@ -1,6 +1,9 @@
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
+
+  OAUTH_CREDENTIALS_PATH = Rails.root.join("config", "audio_providers", "vk.yml")
+  OAUTH_CREDENTIALS = YAML.load_file(OAUTH_CREDENTIALS_PATH)[Rails.env]
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class with default "from" parameter.
@@ -211,7 +214,7 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', :scope => 'user,public_repo'
-  config.omniauth :vkontakte, "3379876", "RAQCqaecyIcYROUfMve5", scope: "audio"
+  config.omniauth :vkontakte, OAUTH_CREDENTIALS[:app_id], OAUTH_CREDENTIALS[:app_secret], scope: "audio"
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
