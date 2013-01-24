@@ -59,9 +59,8 @@ class Playlist
 				refresh
 			end
 			EM.defer(start_download, on_download)
-  		else
-  			refresh
-		end
+    end
+    refresh
 	end	
 
 	def self.playing?

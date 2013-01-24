@@ -44,6 +44,8 @@ after 'deploy:update_code', :roles => :app do
   end
 end
 
+after "deploy", "deploy:migrate"
+
 namespace :deploy do
   task :restart do
     run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -USR2 `cat #{unicorn_pid}`; else cd #{deploy_to}/current && bundle exec unicorn_rails -c #{unicorn_conf} -E #{rails_env} -D; fi"
