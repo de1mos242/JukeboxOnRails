@@ -52,6 +52,11 @@ group :development do
   gem "rvm-capistrano"
 end
 
+group :development, :test do
+  gem 'rspec'
+  gem 'rspec-rails'
+end
+
 group :production do
   gem "pg"
   gem 'unicorn'

@@ -12,6 +12,8 @@ class User < ActiveRecord::Base
     user = User.where(:url => access_token.info.urls.Vkontakte).first
     p access_token.inspect
     unless user.nil?
+      user.token = access_token.credentials.token;
+      user.save!
       user
     else
       User.create!(url: access_token.info.urls.Vkontakte,
