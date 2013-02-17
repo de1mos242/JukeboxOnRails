@@ -1,6 +1,6 @@
 class PlaylistItem < ActiveRecord::Base
   belongs_to :song
-  attr_accessible :position
+  attr_accessible :position, :auto
 
   serialize :skip_makers, Array
 
@@ -14,7 +14,7 @@ class PlaylistItem < ActiveRecord::Base
     Rails.application.config.common_audio_config[:skip_counter].to_i
   end
   
-  def self.add(song)
+  def self.add(song, auto = false)
   	unless PlaylistItem.with_song(song).first.nil?
   		return nil
   	end
@@ -28,6 +28,7 @@ class PlaylistItem < ActiveRecord::Base
   	item.position = item_position
   	item.song = song
     item.skip_makers = []
+    item.auto = auto
   	item.save
   	item
   end
@@ -43,6 +44,7 @@ class PlaylistItem < ActiveRecord::Base
 
   def skipped?()
     p "check skips: #{self.skip_counter}/#{self.class.skips_count_limit}"
+    return true if self.skip_counter > 0
     self.skip_counter >= self.class.skips_count_limit
   end
 

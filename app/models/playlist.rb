@@ -31,6 +31,9 @@ class Playlist
 		unless playing?
 		  p 'do play_next'
 		  play_next
+      unless playing? # instead of play silence play random song from cache
+        play_random
+      end
     end
     push_to_longpoll
 	end
@@ -45,8 +48,8 @@ class Playlist
 		PlaylistItem.current_item.first()
 	end
 
-	def self.add_song(song)
-		PlaylistItem.add(song)
+	def self.add_song(song, auto = false)
+		PlaylistItem.add(song, auto)
 		unless song.downloaded?
 			start_download = Proc.new do 
 				puts "#{song.artist} - #{song.title} run async download"
@@ -98,7 +101,7 @@ class Playlist
 			shift_items(next_item)
 		else
 			shift_items unless current_playlist_item.nil?
-	    end
+	  end
 	end
 
 	def self.shift_items(new_play_item = nil)
@@ -119,6 +122,11 @@ class Playlist
 		end
 		p "new items:"
 		PlaylistItem.all.each { |item| p "  #{item.position}: #{item.song.artist} - #{item.song.title}" }
+  end
+
+  def self.play_random
+    cached_songs = Song.downloaded.all
+    add_song(cached_songs[rand(cached_songs.length)], true)
   end
 
 end
