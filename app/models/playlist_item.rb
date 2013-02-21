@@ -44,7 +44,7 @@ class PlaylistItem < ActiveRecord::Base
 
   def skipped?()
     p "check skips: #{self.skip_counter}/#{self.class.skips_count_limit}"
-    return true if self.skip_counter > 0
+    return true if self.auto and self.skip_counter > 0
     self.skip_counter >= self.class.skips_count_limit
   end
 
