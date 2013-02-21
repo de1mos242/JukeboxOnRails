@@ -22,7 +22,7 @@ role :web, domain
 role :app, domain
 role :db,  domain, :primary => true
 
-before 'deploy:setup', 'rvm:install_rvm', 'rvm:install_ruby' # интеграция rvm с capistrano настолько хороша, что при выполнении cap deploy:setup установит себя и указанный в rvm_ruby_string руби.
+#before 'deploy:setup', 'rvm:install_rvm', 'rvm:install_ruby' # интеграция rvm с capistrano настолько хороша, что при выполнении cap deploy:setup установит себя и указанный в rvm_ruby_string руби.
 
 after 'deploy:setup', :roles => :app do
 	run "mkdir -p #{deploy_to}/shared/config"
