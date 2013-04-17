@@ -126,7 +126,7 @@ class Playlist
 
   def self.play_random
     cached_songs = Song.downloaded.all
-    add_song(cached_songs[rand(cached_songs.length)], true)
+    add_song(cached_songs[rand(cached_songs.length)], true) unless cached_songs.empty?
   end
 
 end

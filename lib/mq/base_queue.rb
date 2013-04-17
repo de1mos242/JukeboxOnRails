@@ -33,39 +33,51 @@ module MessageQueue
 		end
 
 		def self.SendBroadcastInEM(exchange_name,headers,body, need_stop_reactor)
-			credentials = load_credentials
-			AMQP.connect(host: credentials[:location], 
-					user: credentials[:user], 
-					pass: credentials[:pass], 
-					vhost: credentials[:vhost]
-					) do |connection|
-				p "connected to amqp"
-				connection.on_error do |conn, connection_close|
-			      puts <<-ERR
-			      Handling a connection-level exception.
-			 
-			      AMQP class id : #{connection_close.class_id},
-			      AMQP method id: #{connection_close.method_id},
-			      Status code   : #{connection_close.reply_code}
-			      Error message : #{connection_close.reply_text}
-			      ERR
-			 
-			      EventMachine.stop unless need_stop_reactor
-			    end
-				channel = AMQP::Channel.new(connection)
-				channel.on_error do |ch, close|
-    				puts "Huston, channel problems: #{close.reply_text}, #{close.inspect}"
-    				EventMachine.stop unless need_stop_reactor
-  				end
-  				exchange = channel.fanout("#{credentials[:entities_prefix]}.#{exchange_name}")
-  				p "message sending to #{credentials[:entities_prefix]}.#{exchange_name}"
-  				exchange.publish(body, headers: headers, timestamp: Time.now.to_i) do
-  					p "message sended to #{credentials[:entities_prefix]}.#{exchange_name}"
-  					p "reactor state: running? #{EM.reactor_running?} and need_stop_reactor: #{need_stop_reactor}"
-  					EventMachine.stop if need_stop_reactor
-  				end
-			end
-		end
+			@@credentials ||= load_credentials
+      @@channel ||= nil
+      if @@channel
+        push_message(exchange_name,headers,body, need_stop_reactor, @@channel, @@credentials[:entities_prefix])
+      else
+        AMQP.connect(host: @@credentials[:location],
+            user: @@credentials[:user],
+            pass: @@credentials[:pass],
+            vhost: @@credentials[:vhost]
+            ) do |connection|
+          p "connected to amqp"
+          connection.on_error do |conn, connection_close|
+              puts <<-ERR
+              Handling a connection-level exception.
+
+              AMQP class id : #{connection_close.class_id},
+              AMQP method id: #{connection_close.method_id},
+              Status code   : #{connection_close.reply_code}
+              Error message : #{connection_close.reply_text}
+              ERR
+
+              EventMachine.stop unless need_stop_reactor
+          end
+
+          @@connection = connection
+          @@channel = AMQP::Channel.new(connection)
+          @@channel.on_error do |ch, close|
+            puts "Huston, channel problems: #{close.reply_text}, #{close.inspect}"
+            EventMachine.stop unless need_stop_reactor
+          end
+
+          push_message(exchange_name,headers,body, need_stop_reactor, @@channel, @@credentials[:entities_prefix])
+        end
+      end
+    end
+
+    def self.push_message(exchange_name,headers,body, need_stop_reactor, channel, entity_prefix)
+      exchange = channel.fanout("#{entity_prefix}.#{exchange_name}")
+      p "message sending to #{entity_prefix}.#{exchange_name}"
+      exchange.publish(body, headers: headers, timestamp: Time.now.to_i) do
+        p "message sended to #{entity_prefix}.#{exchange_name}"
+        p "reactor state: running? #{EM.reactor_running?} and need_stop_reactor: #{need_stop_reactor}"
+        EventMachine.stop if need_stop_reactor
+      end
+    end
 
     # Required to be running in EventMachine
     def self.Listen(exchange_name, callback)

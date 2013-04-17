@@ -22,7 +22,7 @@
               %li= link_to current_user.username, current_user.url
               %li= link_to "Sign out", destroy_user_session_path, :method => :delete
             - else
-              %li= link_to "Sign in with Vkontakte", user_omniauth_authorize_path(:vkontakte, "audio")
+              %li= link_to "Sign in with Vkontakte", user_omniauth_authorize_path(:vkontakte)
     #main{:role => "main"}
       .container
         .content

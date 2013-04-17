@@ -57,18 +57,19 @@ begin
     Playlist.refresh
 
     connection.on_error do |conn, connection_close|
-	      puts <<-ERR
-	      Handling a connection-level exception.
-	 
-	      AMQP class id : #{connection_close.class_id},
-	      AMQP method id: #{connection_close.method_id},
-	      Status code   : #{connection_close.reply_code}
-	      Error message : #{connection_close.reply_text}
-	      ERR
-	 
-	      EventMachine.stop
-	    end
-		channel = AMQP::Channel.new(connection)
+      puts <<-ERR
+      Handling a connection-level exception.
+
+      AMQP class id : #{connection_close.class_id},
+      AMQP method id: #{connection_close.method_id},
+      Status code   : #{connection_close.reply_code}
+      Error message : #{connection_close.reply_text}
+      ERR
+
+      EventMachine.stop
+    end
+
+    channel = AMQP::Channel.new(connection)
 		channel.on_error do |ch, close|
 			puts "Huston, channel problems: #{close.reply_text}, #{close.inspect}"
 			EventMachine.stop
