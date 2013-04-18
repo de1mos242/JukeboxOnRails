@@ -99,10 +99,13 @@ class PlaylistItemsController < ApplicationController
       p "add skip wish finished at #{Time.now}"
       if item.skipped?
         p "send skip message at #{Time.now}"
-        MessageQueue::BaseQueue.SendBroadcastMessage("playlist.skip",{},"skip please") 
+        MessageQueue::BaseQueue.SendBroadcastMessage("playlist.skip",{},"skip please")
+        p "send skip finished at #{Time.now}"
       end
     end
+    p "do render nothing at #{Time.now}"
     render :nothing => true
+    p "do render nothing finished at #{Time.now}"
   end
 
   def change_volume
