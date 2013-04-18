@@ -15,7 +15,7 @@ stdout_path log_file
 
 preload_app true # Мастер процесс загружает приложение, перед тем, как плодить рабочие процессы.
 
-#GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=) # Решительно не уверен, что значит эта строка, но я решил ее оставить.
+GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=) # Решительно не уверен, что значит эта строка, но я решил ее оставить.
 
 before_exec do |server|
   ENV["BUNDLE_GEMFILE"] = "#{rails_root}/Gemfile"
@@ -37,6 +37,8 @@ before_fork do |server, worker|
 end
 
 after_fork do |server, worker|
+  Thread.new { EventMachine.run }
+
   # После того как рабочий процесс создан, он устанавливает соединение с базой.
   defined?(ActiveRecord::Base) and
   ActiveRecord::Base.establish_connection
