@@ -11,10 +11,14 @@ module MessageQueue
 				p "sending message #{exchange_name} with #{body} when reactor_running? #{event_machine_was_running}"
 				if event_machine_was_running
 					SendBroadcastInEM(exchange_name, headers, body, false)
-				else
+        else
+          p "run reactor at #{Time.new}"
 					EM.run do
+            p "send in runned EM at #{Time.new}"
 						SendBroadcastInEM(exchange_name, headers, body, true)
-					end
+            p "send finished in runned EM at #{Time.new}"
+          end
+          p "run reactor finished at #{Time.new}"
 				end
 			rescue Exception => e
 				puts "Hustron, some common problems with send: #{e}"
@@ -77,7 +81,8 @@ module MessageQueue
       exchange.publish(body, headers: headers, timestamp: Time.now.to_i) do
         p "message sended to #{entity_prefix}.#{exchange_name} at #{Time.now}"
         p "reactor state: running? #{EM.reactor_running?} and need_stop_reactor: #{need_stop_reactor}"
-        # EventMachine.stop if need_stop_reactor #try don't stop reactor
+        EventMachine.stop if need_stop_reactor
+        p "reactor state after stop: running? #{EM.reactor_running?} and need_stop_reactor: #{need_stop_reactor}"
       end
     end
 
