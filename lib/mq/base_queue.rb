@@ -33,9 +33,11 @@ module MessageQueue
 		end
 
 		def self.SendBroadcastInEM(exchange_name,headers,body, need_stop_reactor)
+      p "send message #{exchange_name} at #{Time.now}"
 			@@credentials ||= load_credentials
       @@channel ||= nil
       if @@channel
+        p "from cache  at #{Time.now}"
         push_message(exchange_name,headers,body, need_stop_reactor, @@channel, @@credentials[:entities_prefix])
       else
         AMQP.connect(host: @@credentials[:location],
@@ -43,7 +45,7 @@ module MessageQueue
             pass: @@credentials[:pass],
             vhost: @@credentials[:vhost]
             ) do |connection|
-          p "connected to amqp"
+          p "connected to amqp  at #{Time.now}"
           connection.on_error do |conn, connection_close|
               puts <<-ERR
               Handling a connection-level exception.
@@ -71,11 +73,11 @@ module MessageQueue
 
     def self.push_message(exchange_name,headers,body, need_stop_reactor, channel, entity_prefix)
       exchange = channel.fanout("#{entity_prefix}.#{exchange_name}")
-      p "message sending to #{entity_prefix}.#{exchange_name}"
+      p "message sending to #{entity_prefix}.#{exchange_name} at #{Time.now}"
       exchange.publish(body, headers: headers, timestamp: Time.now.to_i) do
-        p "message sended to #{entity_prefix}.#{exchange_name}"
+        p "message sended to #{entity_prefix}.#{exchange_name} at #{Time.now}"
         p "reactor state: running? #{EM.reactor_running?} and need_stop_reactor: #{need_stop_reactor}"
-        EventMachine.stop if need_stop_reactor
+        # EventMachine.stop if need_stop_reactor #try don't stop reactor
       end
     end
 

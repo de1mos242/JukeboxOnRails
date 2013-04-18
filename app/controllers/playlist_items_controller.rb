@@ -92,10 +92,13 @@ class PlaylistItemsController < ApplicationController
 
   def skip
     item = PlaylistItem.find_by_position(0)
+    p "try skip at #{Time.now}"
     if item
+      p "add skip wish at #{Time.now}"
       item.add_skip_wish(session[:session_id])
+      p "add skip wish finished at #{Time.now}"
       if item.skipped?
-        p "send skip message"
+        p "send skip message at #{Time.now}"
         MessageQueue::BaseQueue.SendBroadcastMessage("playlist.skip",{},"skip please") 
       end
     end
