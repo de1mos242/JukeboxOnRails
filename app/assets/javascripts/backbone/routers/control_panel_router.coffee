@@ -21,18 +21,22 @@ class JukeboxOnRails.Routers.ControlPanelRouter extends Backbone.Router
     $("#songs").html(@view.render().el)
 
   find: (query = '')->
+    @last_query = decodeURIComponent(query)
     @view = new JukeboxOnRails.Views.Songs.IndexView()
     $("#songs").html(@view.render().el)
+    $("#find_query").val(@last_query)
     $('#find_song_button').attr('disabled', 'disabled')
     $('#find_song_button').attr('value', 'Searching...')
-    query = decodeURIComponent(query)
-    @songs.fetch({data: {find_query: query}})
+    self = this
+    @songs.fetch({data: {find_query: query}, success: () ->
+        self.on_fetch_songs()
+      }
+    )
+
+  on_fetch_songs: () ->
     @view = new JukeboxOnRails.Views.Songs.IndexView(songs: @songs)
     $("#songs").html(@view.render().el)
-    @view.addAll()
-    $("#find_query").val(query)
-    $('#find_song_button').attr('value', 'Search')
-    $('#find_song_button').removeAttr('disabled')
+    $("#find_query").val(@last_query)
 
   show: (id) ->
     song = @songs.get(id)

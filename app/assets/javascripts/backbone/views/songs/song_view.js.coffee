@@ -20,5 +20,5 @@ class JukeboxOnRails.Views.Songs.SongView extends Backbone.View
     @model.set('added_to_playlist', true)
 
   render: ->
-    this.$el.html(@template(@model.toJSON() ))
+    @$el.html(@template(@model.toJSON() ))
     return this
