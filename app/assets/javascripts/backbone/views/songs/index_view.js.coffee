@@ -26,14 +26,16 @@ class JukeboxOnRails.Views.Songs.IndexView extends Backbone.View
 
   addAll: () =>
     @$("#songs_list").empty()
+    @memoryElement = $('<div />', {id: 'songs_data'})
     @selectedSongs.each(@addOne)
+    @$("#songs_list").append(@memoryElement)
 
   addOne: (song) =>
     view = new JukeboxOnRails.Views.Songs.SongView({model : song})
-    @$("#songs_list").append(view.render().el)
+    @memoryElement.append(view.render().el)
 
   render: =>
-    $(@el).html(@template(songs: @selectedSongs.toJSON() ))
+    $(@el).html(@template())
     @addAll()
 
     return this
