@@ -14,11 +14,13 @@ class JukeboxOnRails.Views.Songs.IndexView extends Backbone.View
 
   selectSongs: (e) =>
     searchQuery = $('#find_query').val().toLowerCase()
-    @selectedSongs = new JukeboxOnRails.Collections.SongsCollection()
-    @options.songs.each( (song) ->
-      if song.get('artist').toLowerCase().search(searchQuery) >= 0 || song.get('title').toLowerCase().search(searchQuery) >= 0
-        @selectedSongs.add(song)
-    this)
+    if searchQuery.length == 0
+      @selectedSongs = @options.songs
+    else
+      @selectedSongs = new JukeboxOnRails.Collections.SongsCollection()
+      for idxItem in @songIndex
+        if idxItem.idx.search(searchQuery) >= 0
+          @selectedSongs.add(idxItem.data)
     @addAll()
 
   clearSearchField: (e) =>
@@ -28,6 +30,10 @@ class JukeboxOnRails.Views.Songs.IndexView extends Backbone.View
     @options.songs = new JukeboxOnRails.Collections.SongsCollection() unless @options.songs?
     @options.songs.bind('reset', @addAll)
     @selectedSongs = @options.songs
+    @songIndex = []
+    @selectedSongs.each((song) ->
+      @songIndex.push {idx: song.get('artist').toLowerCase() + " " + song.get('title').toLowerCase(), data: song }
+    this)
 
   addAll: () =>
     @$el.find("#songs_list").empty()
