@@ -1,3 +1,4 @@
 %ul.songs_list#playlist_items_container
-  - @playlist_items.each do |playlist_item|
-    = render partial: "playlist_item", object: playlist_item 
+  - if @playlist_items
+    - @playlist_items.each do |playlist_item|
+      = render partial: "playlist_item", object: playlist_item

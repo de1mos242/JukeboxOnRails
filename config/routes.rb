@@ -9,7 +9,8 @@ JukeboxOnRails::Application.routes.draw do
   #resources :playlist_items
 
   #resources :songs
-  get "songs/index", :as => :songs
+  #get "songs/index", :as => :songs
+
 
   match 'playlist_items' => 'playlist_items#index', :as => :playlist_items
   match 'playlist_items/stop' => 'playlist_items#stop', :as => :playlist_stop
@@ -17,6 +18,7 @@ JukeboxOnRails::Application.routes.draw do
   match 'playlist_items/volume' => 'playlist_items#change_volume', :as => :change_volume
   match 'playlist_items/update_current_song' => 'playlist_items#now_playing', :as => :update_now_playing
 
+  match 'find(/:find_query)' => 'control_panel#index', as: :short_find_songs
   match 'songs/find' => 'songs#find', :as => :find_songs
   match 'songs/queue' => 'songs#add_to_playlist', :as => :add_to_playlist
 

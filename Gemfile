@@ -31,6 +31,8 @@ end
 
 gem 'jquery-rails'
 
+gem 'rails-backbone'
+
 gem 'thin'
 gem "eventmachine"
 gem 'async_sinatra'

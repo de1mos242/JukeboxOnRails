@@ -8,6 +8,7 @@ prevous_song = null;
 last_update = null;
 
 refreshPage = (request_data) ->
+  return null unless (long_poll_server_url?)
   request = $.ajax({
     #url: 'http://localhost/',
     #type: 'POST'
@@ -65,15 +66,15 @@ addToPlaylistBlocker = () ->
 
 $(() ->
   $("#refresh-btn").click(refreshPage);
-  $("#clear-btn").click(() ->
-      $("#find_query").val('');
-    );
+  #$("#clear-btn").click(() ->
+  #    $("#find_query").val('');
+  #  );
 
-  addToPlaylistBlocker();
+  #addToPlaylistBlocker();
 
-  $("#find_form").bind("ajax:success", (xhr, data, status) ->
-        onFindSongs(data);
-    );
+  #$("#find_form").bind("ajax:success", (xhr, data, status) ->
+  #      onFindSongs(data);
+  #  );
 
   refreshPage(null);
 );

@@ -94,26 +94,34 @@ class SongsController < ApplicationController
   end
 
   def find
-    unless params["find_query"].blank?
-      finded_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])[0...30]
+    if !params["find_query"].blank? && user_signed_in?
+      #found_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])[0...30]
+      vk = VkontakteApi::Client.new current_user.token
+      vk_songs = vk.audio.search(q: params["find_query"], auto_complete:1, count:30)
+      found_songs = vk_songs[1..30].collect do |vk_song|
+        { artist: vk_song.artist,
+          track_name: vk_song.title,
+          url: vk_song.url,
+          duration: sprintf("%02d:%02d", vk_song.duration/60, vk_song.duration%60)
+        }
+      end
       @songs = []
-      p "find songs #{finded_songs.collect {|song_data| song_data[:url]}}"
-      songs_in_cache = Song.where(url: finded_songs.collect {|song_data| song_data[:url]})
-      finded_songs.each do |song_data|
-        song = songs_in_cache.select {|s| s.url == song_data[:url]}
-        if song.nil?
-          song = Song.new(artist:song_data[:artist], title:song_data[:track_name], url:song_data[:url])
-        end
+      songs_in_cache = Song.where(url: found_songs.collect {|song_data| song_data[:url]})
+      found_songs.each do |song_data|
+        cached_song = songs_in_cache.select {|s| s.url == song_data[:url]}
+        song = nil
+        song = cached_song[0] if cached_song.size > 0
+        song = Song.new(artist: song_data[:artist], title: song_data[:track_name], url: song_data[:url], duration: song_data[:duration]) if song.nil?
         @songs.push(song)
       end
     else
       @songs = Song.downloaded
     end
+
     respond_to do |format|
-      format.html { render :index }
+      format.html { render 'control_panel/index'}
       format.json { render json: @songs }
     end
-    
   end
 
   def download

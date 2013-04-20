@@ -5,6 +5,7 @@ class ControlPanelController < ApplicationController
     @playlist_items = PlaylistItem.position_sorted.in_queue
     @volumes = AudioPlayback::GStreamPlayback.get_current_volume
     @shoutcast_url = AudioPlayback::GStreamPlayback.get_shoutcast_url
+    @songs = Song.downloaded
     puts "shoutcast_url= #{@shoutcast_url}"
     
     respond_to do |format|

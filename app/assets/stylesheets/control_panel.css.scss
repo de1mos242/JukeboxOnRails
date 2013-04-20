@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.songs_list {
+#songs_list {
   list-style: none;//inside url(/assets/musical_note.png);
   margin: 0;
 }
@@ -33,7 +33,7 @@
 }
 
 .song_form {
-  margin: 0;
+  //margin: 0;
 }
 
 .song_data {

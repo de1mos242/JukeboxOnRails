@@ -1,0 +1,16 @@
+<form accept-charset="UTF-8" action="/songs/queue" class="song_form song <% if (filename) {print('downloaded')} %>" data-remote="true" id="new_song" method="post" >
+    <input id="artist" name="song[artist]" type="hidden" value="<%= artist %>" />
+    <input id="title" name="song[title]" type="hidden" value="<%= title %>" />
+    <input id="url" name="song[url]" type="hidden" value="<%= url %>" />
+    <input id="duration" name="song[duration]" type="hidden" value="<%= duration %>" />
+    <input id="id" name="song[id]" type="hidden" value="<%= id %>" />
+    <input class="btn add_to_playlist pull-right" name="commit" type="submit" value="add to playlist" />
+    <div>
+        <span class='duration pull-right'><%= duration %></span>
+    </div>
+    <div class='song_data'>
+        <span class='artist'><%= artist %></span>
+        <span> - </span>
+        <span class='title'><%= title %></span>
+    </div>
+</form>
