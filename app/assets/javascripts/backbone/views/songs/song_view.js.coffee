@@ -17,6 +17,7 @@ class JukeboxOnRails.Views.Songs.SongView extends Backbone.View
 
   onClickAddToPlaylist: (e) ->
     $(e.target).find('.add_to_playlist').hide('fast');
+    @model.set('added_to_playlist', true)
 
   render: ->
     this.$el.html(@template(@model.toJSON() ))

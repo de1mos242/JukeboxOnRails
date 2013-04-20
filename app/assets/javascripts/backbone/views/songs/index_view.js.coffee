@@ -6,6 +6,7 @@ class JukeboxOnRails.Views.Songs.IndexView extends Backbone.View
   events:
     "submit .form-search": "findSongs"
     "input #find_query": "selectSongs"
+    "click #clear-btn": "clearSearchField"
 
   findSongs: (e) =>
     e.preventDefault()
@@ -20,7 +21,11 @@ class JukeboxOnRails.Views.Songs.IndexView extends Backbone.View
     this)
     @addAll()
 
+  clearSearchField: (e) =>
+    $('#find_query').val('')
+
   initialize: () ->
+    @options.songs = new JukeboxOnRails.Collections.SongsCollection() unless @options.songs?
     @options.songs.bind('reset', @addAll)
     @selectedSongs = @options.songs
 
@@ -36,6 +41,5 @@ class JukeboxOnRails.Views.Songs.IndexView extends Backbone.View
 
   render: =>
     $(@el).html(@template())
-    @addAll()
 
     return this

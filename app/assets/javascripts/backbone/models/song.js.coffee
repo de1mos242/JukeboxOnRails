@@ -6,6 +6,7 @@ class JukeboxOnRails.Models.Song extends Backbone.Model
     title: null
     url: null
     duration: null
+    added_to_playlist: false
 
 class JukeboxOnRails.Collections.SongsCollection extends Backbone.Collection
   model: JukeboxOnRails.Models.Song
