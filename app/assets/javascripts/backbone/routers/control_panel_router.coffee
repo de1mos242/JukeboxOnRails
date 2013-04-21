@@ -46,7 +46,7 @@ class JukeboxOnRails.Routers.ControlPanelRouter extends Backbone.Router
   on_failure_search: (e) ->
     $('#find_song_button').removeAttr('disabled')
     $('#find_song_button').attr('value', 'Search')
-    $('#error_block').append('<p>Search failed</p>')
+    $('#error_block').append('<p>Search failed, try to relogin</p>')
 
   show: (id) ->
     song = @songs.get(id)
