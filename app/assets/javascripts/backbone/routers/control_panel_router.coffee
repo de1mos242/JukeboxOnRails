@@ -32,7 +32,9 @@ class JukeboxOnRails.Routers.ControlPanelRouter extends Backbone.Router
     self = this
     @songs.fetch({data: {find_query: query}, success: () ->
         self.on_fetch_songs()
-      }
+    error: (e) ->
+      self.on_failure_search(e)
+    }
     )
 
   on_fetch_songs: () ->
@@ -40,6 +42,11 @@ class JukeboxOnRails.Routers.ControlPanelRouter extends Backbone.Router
     @view = new JukeboxOnRails.Views.Songs.IndexView(songs: @songs)
     $("#songs").html(@view.render().el)
     $("#find_query").val(@last_query)
+
+  on_failure_search: (e) ->
+    $('#find_song_button').removeAttr('disabled')
+    $('#find_song_button').attr('value', 'Search')
+    $('#error_block').append('<p>Search failed</p>')
 
   show: (id) ->
     song = @songs.get(id)
