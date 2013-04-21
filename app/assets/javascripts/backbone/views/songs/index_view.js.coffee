@@ -38,7 +38,7 @@ class JukeboxOnRails.Views.Songs.IndexView extends Backbone.View
     )
 
     @options.songs = new JukeboxOnRails.Collections.SongsCollection() unless @options.songs?
-    @options.songs.bind('reset', @addAll)
+    @options.songs.bind('reset', @addFirstPage)
     @selectedSongs = @options.songs
     @songIndex = []
     @selectedSongs.each((song) ->
