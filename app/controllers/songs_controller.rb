@@ -96,9 +96,10 @@ class SongsController < ApplicationController
   def find
     if !params["find_query"].blank? && user_signed_in?
       #found_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])[0...30]
+      count = 100
       vk = VkontakteApi::Client.new current_user.token
-      vk_songs = vk.audio.search(q: params["find_query"], auto_complete:1, count:30)
-      found_songs = vk_songs[1..30].collect do |vk_song|
+      vk_songs = vk.audio.search(q: params["find_query"], auto_complete:1, count: count)
+      found_songs = vk_songs[1..count].collect do |vk_song|
         { artist: vk_song.artist,
           track_name: vk_song.title,
           url: vk_song.url,

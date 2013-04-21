@@ -17,11 +17,13 @@ class JukeboxOnRails.Routers.ControlPanelRouter extends Backbone.Router
     $("#songs").html(@view.render().el)
 
   index: ->
+    @view.dispose() if @view
     @view = new JukeboxOnRails.Views.Songs.IndexView(songs: @songs)
     $("#songs").html(@view.render().el)
 
   find: (query = '')->
     @last_query = decodeURIComponent(query)
+    @view.dispose() if @view
     @view = new JukeboxOnRails.Views.Songs.IndexView()
     $("#songs").html(@view.render().el)
     $("#find_query").val(@last_query)
@@ -34,6 +36,7 @@ class JukeboxOnRails.Routers.ControlPanelRouter extends Backbone.Router
     )
 
   on_fetch_songs: () ->
+    @view.dispose() if @view
     @view = new JukeboxOnRails.Views.Songs.IndexView(songs: @songs)
     $("#songs").html(@view.render().el)
     $("#find_query").val(@last_query)
