@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130217160021) do
+ActiveRecord::Schema.define(:version => 20130421173151) do
 
   create_table "playlist_items", :force => true do |t|
     t.integer  "song_id"
@@ -24,6 +24,22 @@ ActiveRecord::Schema.define(:version => 20130217160021) do
   end
 
   add_index "playlist_items", ["song_id"], :name => "index_playlist_items_on_song_id", :unique => true
+
+  create_table "room_memberships", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "room_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "room_memberships", ["room_id"], :name => "index_room_memberships_on_room_id"
+  add_index "room_memberships", ["user_id"], :name => "index_room_memberships_on_user_id"
+
+  create_table "rooms", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "songs", :force => true do |t|
     t.string   "artist"
@@ -58,6 +74,7 @@ ActiveRecord::Schema.define(:version => 20130217160021) do
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
     t.string   "token",                  :default => "empty", :null => false
+    t.string   "roles"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
