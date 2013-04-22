@@ -1,0 +1,16 @@
+= form_for @room do |f|
+  - if @room.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@room.errors.count, "error")} prohibited this room from being saved:"
+      %ul
+        - @room.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :name
+    = f.text_field :name
+    = collection_select :room, :user_ids, @users, :id, :username,{},{multiple: true}
+    //= select_tag 'room[user_ids]', options_from_collection_for_select(@users, :id, :username),{multiple: true}
+    //= f.select :users, options_from_collection_for_select(@users, :id, :username), {}, {multiple: true}
+  .actions
+    = f.submit 'Save'
