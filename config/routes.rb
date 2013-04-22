@@ -1,4 +1,7 @@
 JukeboxOnRails::Application.routes.draw do
+  resources :rooms
+
+
   get "omniauth_callbacks/vkontakte"
 
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
