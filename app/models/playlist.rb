@@ -1,55 +1,67 @@
 rails_root = File.expand_path('../../..', __FILE__)
 require 'eventmachine'
 require "#{rails_root}/lib/mq/base_queue"
+
 class Playlist
 	include AudioPlayback
 
-  def self.get_data
+  def self.prepare_players
+    @players = {}
+    Room.all.each do |room|
+      @players[room.id] = AudioPlayback::GStreamPlayback.new(room.id)
+    end
+    p @players.inspect
+  end
+
+  prepare_players
+
+  def self.get_data(room)
     data = {}
-    data[:playlist_items] = PlaylistItem.position_sorted.in_queue.all
-    data[:current_song] = PlaylistItem.current_song
+    data[:playlist_items] = PlaylistItem.position_sorted.in_queue.in_room(room).all
+    data[:current_song] = PlaylistItem.current_song(room)
     data
   end
 
-  def self.prepare_longpoll_message(timestamp)
-    new_data = get_data
+  def self.prepare_longpoll_message(room, timestamp)
+    new_data = get_data(room)
     result = '{'
     result += "\"playlist_items\": #{new_data[:playlist_items].to_json(include: {song: {only: [:artist, :title, :duration]}}).html_safe},"
     result += "\"current_song\": #{new_data[:current_song].to_json(only: [:artist, :title, :duration]).html_safe},"
     result += "\"last_update\": \"#{timestamp}\""
+    result += "\"room\": \"#{room}\""
     result += '}'
     result
   end
 
-  def self.push_to_longpoll
+  def self.push_to_longpoll(room)
     update_ts = Time.now.to_r.to_s
-    MessageQueue::BaseQueue.SendBroadcastMessage("longpoll.refresh", {update_ts: update_ts}, prepare_longpoll_message(update_ts))
+    MessageQueue::BaseQueue.SendBroadcastMessage("longpoll.refresh", {update_ts: update_ts}, prepare_longpoll_message(room, update_ts))
   end
 	
-	def self.refresh
+	def self.refresh(room)
 		p "on refresh"
-		unless playing?
+		unless playing? (room)
 		  p 'do play_next'
-		  play_next
-      unless playing? # instead of play silence play random song from cache
-        play_random
+		  play_next(room)
+      unless playing?(room) # instead of play silence play random song from cache
+        play_random(room)
       end
     end
-    push_to_longpoll
+    push_to_longpoll(room)
 	end
 
-	def self.current_song
-		playlist_item = current_playlist_item
+	def self.current_song(room)
+		playlist_item = current_playlist_item(room)
 		return playlist_item.song unless playlist_item.nil?
 		nil
 	end
 
-	def self.current_playlist_item
-		PlaylistItem.current_item.first()
+	def self.current_playlist_item(room)
+		PlaylistItem.current_item.in_room(room).first()
 	end
 
-	def self.add_song(song, auto = false)
-		PlaylistItem.add(song, auto)
+	def self.add_song(room, song, auto = false)
+		PlaylistItem.add(room, song, auto)
 		unless song.downloaded?
 			start_download = Proc.new do 
 				puts "#{song.artist} - #{song.title} run async download"
@@ -59,74 +71,75 @@ class Playlist
 				puts "#{song.artist} - #{song.title} #{filename} downloaded callback"
 				song.filename = filename
 				song.save!
-				refresh
+				refresh(room)
 			end
 			EM.defer(start_download, on_download)
     end
-    refresh
+    refresh(room)
 	end	
 
-	def self.playing?
-		AudioPlayback::GStreamPlayback.playing?
+	def self.playing?(room)
+    p "is playing? for #{room}"
+    @players[room].playing?
 	end
 
-	def self.skip
+	def self.skip(room)
 		p "on skip"
-		AudioPlayback::GStreamPlayback.stop if playing?
+    @players[room].stop if playing?
 		#refresh
 		p "skip finished"
 	end
 
-	def self.stop
-		PlaylistItem.destroy_all
-		skip
+	def self.stop(room)
+		PlaylistItem.in_room(room).destroy_all
+		skip(room)
 	end
 
-	def self.play_next
+	def self.play_next(room)
 		p "on play_next"
-		return if playing?
+		return if playing?(room)
 		p "play_next song"
-		next_item = PlaylistItem.downloaded.position_sorted.in_queue.first
+		next_item = PlaylistItem.downloaded.in_room(room).position_sorted.in_queue.first
 		unless next_item.nil?
 			p "next_item found"
-			p "kick player: #{next_item.position}: #{next_item.song.artist} - #{next_item.song.title}"
-			AudioPlayback::GStreamPlayback.play_song({
+			p "kick player in room #{room}: #{next_item.position}: #{next_item.song.artist} - #{next_item.song.title}"
+      @players[room].play_song({
 				filename: next_item.song.filename, 
 				artist: next_item.song.artist, 
 				title: next_item.song.title}) do 
 					p "refresh callback from player"
-					refresh
+					refresh(room)
 				end
 			p "shift after play_next"
-			shift_items(next_item)
+			shift_items(room, next_item)
 		else
-			shift_items unless current_playlist_item.nil?
+			shift_items(room) unless current_playlist_item(room).nil?
 	  end
 	end
 
-	def self.shift_items(new_play_item = nil)
+	def self.shift_items(room, new_play_item = nil)
 		p "shift elements #{new_play_item}"
-		PlaylistItem.where("position <= 0").each {|item| item.destroy }
+		PlaylistItem.in_room(room).where("position <= 0").each {|item| item.destroy }
 		if new_play_item && new_play_item.position > 1
 			item = PlaylistItem.find(new_play_item.id) # prevent read-only record
 			item.position = 0
 			item.save!
-		elsif PlaylistItem.downloaded.size == 0 && PlaylistItem.all.size > 0
+		elsif PlaylistItem.in_room(room).downloaded.size == 0 && PlaylistItem.in_room(room).size > 0
 			#do nothing
 			p "we have in downloaded queue"
 		else
-			PlaylistItem.all.each do |item|
+			PlaylistItem.in_room(room).each do |item|
 				item.position -= 1
 				item.save!
 			end
 		end
 		p "new items:"
-		PlaylistItem.all.each { |item| p "  #{item.position}: #{item.song.artist} - #{item.song.title}" }
+		PlaylistItem.in_room(room).each { |item| p "  #{item.position}: #{item.song.artist} - #{item.song.title}" }
   end
 
-  def self.play_random
-    cached_songs = Song.downloaded.all
-    add_song(cached_songs[rand(cached_songs.length)], true) unless cached_songs.empty?
+  def self.play_random(room)
+    cached_songs = Song.downloaded.in_room(room).all
+    add_song(room, cached_songs[rand(cached_songs.length)], true) unless cached_songs.empty?
   end
 
 end
