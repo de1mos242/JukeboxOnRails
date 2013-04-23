@@ -2,7 +2,7 @@ require "open-uri"
 require 'yaml'
 
 class Song < ActiveRecord::Base
-  attr_accessible :artist, :filename, :title, :url, :song_hash, :duration
+  attr_accessible :artist, :filename, :title, :url, :song_hash, :duration, :room
   before_create :fill_song_hash
 
   validate :artist, presents:true
@@ -13,6 +13,7 @@ class Song < ActiveRecord::Base
   scope :downloaded, conditions: "filename is not null"
   scope :in_playlist, joins().where("songs.filename is not null")
   scope :with_url, lambda { |url| {conditions: ['song_hash = ?', url.gsub(/^.+\//, '')]} }
+  scope :in_room, lambda { | room_id | {conditions: ["room = ?", room_id]}}
   
   def downloaded?
   	not self.filename.blank?

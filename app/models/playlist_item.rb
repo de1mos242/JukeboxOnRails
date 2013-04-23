@@ -9,13 +9,14 @@ class PlaylistItem < ActiveRecord::Base
   scope :downloaded, joins(:song).where("songs.filename is not null")
   scope :in_queue, conditions: "position > 0"
   scope :current_item, conditions: "position = 0"
+  scope :in_room, lambda { |room_id| joins(:song).where("room = ?", room_id).readonly(false) }
 
   def self.skips_count_limit
     Rails.application.config.common_audio_config[:skip_counter].to_i
   end
   
-  def self.add(song, auto = false)
-  	unless PlaylistItem.with_song(song).first.nil?
+  def self.add(room, song, auto = false)
+  	unless PlaylistItem.in_room(room).with_song(song).first.nil?
   		return nil
   	end
 
@@ -25,7 +26,7 @@ class PlaylistItem < ActiveRecord::Base
   	 	item_position = last_item.position+1
   	end
   	item = PlaylistItem.new
-  	item.position = item_position
+    item.position = item_position
   	item.song = song
     item.skip_makers = []
     item.auto = auto
@@ -48,8 +49,8 @@ class PlaylistItem < ActiveRecord::Base
     self.skip_counter >= self.class.skips_count_limit
   end
 
-  def self.current_song
-    item = current_item.first()
+  def self.current_song(room)
+    item = current_item.in_room(room).first()
     return item.song unless item.nil?
     nil
   end

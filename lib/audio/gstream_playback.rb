@@ -5,41 +5,48 @@ module AudioPlayback
   
   class GStreamPlayback
 
+    @loop = GLib::MainLoop.new(nil, false)
+
+    p "run thread"
+    @play_thread = Thread.new do
+      loop do
+        p "start loop"
+        begin
+          @loop.run
+          p "loop end"
+        rescue Exception => ex
+          p "get exception #{ex}"
+        ensure
+          #@pipeline.stop
+          p "stop playing"
+        end
+        p "exit loop"
+      end
+    end
+    p "from #{Thread.current} created #{@play_thread}"
+
     # song = {filename, artist, title}
-    def self.play_song(song, &on_stop)
-      instance.set_song song
+    def play_song(song, &on_stop)
+      set_song song
       p "run play file"
-      instance.set_callback on_stop
-      instance.play
+      set_callback on_stop
+      play
     end
 
-    def self.playing?
-      instance.playing?
+    def get_current_volume
+      {"min" => 30, "max" => 100, "current" => (volume * 100).round}
     end
 
-    def self.stop
-      instance.stop
+    def set_volume(value)
+      @volume = value
     end
 
-    def self.get_current_volume
-      {"min" => 30, "max" => 100, "current" => (instance.volume * 100).round}
+    def get_position
+      @current_position
     end
 
-    def self.set_volume(value)
-      instance.volume = value
-    end
-
-    def self.get_position
-      instance.current_position
-    end
-
-    def self.get_shoutcast_url
-      instance.shoutcast_url
-    end
-
-    def self.instance
-      p "create new instance" if @instance.nil?
-      @instance ||= new
+    def initialize(room_name)
+      @room_name = "#{room_name}.mp3"
     end
 
     def prepare
@@ -85,11 +92,11 @@ module AudioPlayback
         @shoutcast.ip = shoutcast_config[:ip]
         @shoutcast.port = shoutcast_config[:port]
         @shoutcast.password = shoutcast_config[:password]
-        @shoutcast.mount = shoutcast_config[:mount]
+        @shoutcast.mount = @room_name
         @shoutcast.sync = shoutcast_config[:sync]
         @shoutcast.max_lateness = shoutcast_config[:max_lateness]
 
-        @shoutcast_url = shoutcast_config[:listen_url]
+        @shoutcast_url = shoutcast_config[:listen_url] + @room_name
       end
 
       @pipeline.add(@filesrc, @decoder, @volume_control, @tee)
@@ -98,8 +105,6 @@ module AudioPlayback
       @filesrc >> @decoder >> @volume_control >> @tee
       @tee >> @audiosink_queue >> @audiosink if speakers_config[:enabled]
       @tee >> @shoutcast_queue >> @audioconvert >> @lame >> @taginject >> @shoutcast if shoutcast_config[:enabled]
-
-      @loop = GLib::MainLoop.new(nil, false)
 
       bus = @pipeline.bus
       bus.add_watch do |bus, message|
@@ -117,25 +122,7 @@ module AudioPlayback
         true
       end
 
-      p "run thread"
-      @play_thread = Thread.new do
-        loop do
-          p "start loop"
-          begin
-            @loop.run
-            p "loop end"
-          rescue Exception => ex
-            p "get exception #{ex}"
-          ensure
-            #@pipeline.stop
-            p "stop playing"
-          end
-          p "exit loop"
-        end
-      end
-      p "from #{Thread.current} created #{@play_thread}"
-
-      @prepared = true;
+      @prepared = true
     end
 
     def prepared?
