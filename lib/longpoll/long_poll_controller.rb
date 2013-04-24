@@ -6,24 +6,23 @@ require 'active_record'
 require 'active_support/all'
 require 'active_support/json'
 
-db_config = YAML.load(File.read("#{rails_root}/config/database.yml")).with_indifferent_access
-ActiveRecord::Base.include_root_in_json = false
-ActiveRecord::Base.configurations = db_config
-ActiveRecord::Base.establish_connection(ENV['RACK_ENV'] || 'development')
-
-require "#{rails_root}/app/models/playlist_item"
-require "#{rails_root}/app/models/song"
 require "#{rails_root}/lib/mq/base_queue"
 
 class LongPollController < Sinatra::Base
   register Sinatra::Async
 
-  @@current_data = "{}"
-  @@changed_time = Time.now
+  @@rooms = {}
+
+  def self.get_empty_room
+    {data: "{}", time: Time.now}
+  end
 
   listener_callback = proc do |body, metadata|
-    @@current_data = body
-    @@changed_time = Time.at(metadata.headers["update_ts"].to_r)
+    room = metadata.headers["room"]
+    p "takes message for room #{room} with #{body}"
+    @@rooms[room] = {}
+    @@rooms[room][:data] = body
+    @@rooms[room][:time] = Time.at(metadata.headers["update_ts"].to_r)
   end
 
   EM.next_tick do
@@ -75,21 +74,26 @@ class LongPollController < Sinatra::Base
         end
       end
 
+      room_id = params["room"]
+      unless @@rooms.has_key?(room_id)
+        @@rooms[room_id] = get_empty_room
+      end
 
       p "params: #{params.inspect} #{params["last_update"]} and #{params["last_update"].blank?}"
-      unless params["last_update"].blank?
+      if !params["last_update"].blank? && !params["room"].blank?
         p "run async"
         request_time = Time.at(params["last_update"].to_r)
+
         p "request_time: #{request_time}"
         pollster = proc do
           time = 0
           until time > 25
-            break if @@changed_time > request_time
+            break if @@rooms[room_id][:time] > request_time
             sleep 0.5
             time += 0.5
           end
-          p "data changed! with #{@@changed_time} and #{request_time}" if @@changed_time > request_time
-          @@changed_time > request_time ? {has_data: true, new_data: @@current_data} : {has_data:false}
+          p "data changed! with #{@@rooms[room_id][:time]} and #{request_time}" if @@rooms[room_id][:time] > request_time
+          @@rooms[room_id][:time] > request_time ? {has_data: true, new_data: @@rooms[room_id][:data]} : {has_data:false}
         end
         p "begin async"
         # Begin asynchronous work
@@ -97,7 +101,7 @@ class LongPollController < Sinatra::Base
 
       else
         p 'answer sync'
-        callback.call({has_data: true, new_data: @@current_data})
+        callback.call({has_data: true, new_data: @@rooms[room_id][:data]})
         #body "ok"
       end
 

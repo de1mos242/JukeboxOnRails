@@ -24,8 +24,8 @@ require "#{rails_root}/app/models/playlist"
 
 credentials = MessageQueue::BaseQueue.load_credentials
 
-def on_refresh_message(room)
-	Playlist.refresh(room)
+def on_refresh_message(room = nil)
+  Playlist.refresh(room)
 end
 
 def on_stop_message(room)
@@ -83,7 +83,7 @@ begin
 		p "refresh"
 		exchange = channel.fanout("#{exchange_prefix}.playlist.refresh")
 		channel.queue("#{exchange_prefix}.playlist.refresh.queue", auto_delete:true).bind(exchange).subscribe do |metadata, payload|
-    		room = metadata.heeaders["room_id"]
+    		room = metadata.headers["room_id"]
         p "get refresh for #{room}"
         on_refresh_message(room)
 		end
