@@ -28,27 +28,34 @@ class Playlist
     result += "\"playlist_items\": #{new_data[:playlist_items].to_json(include: {song: {only: [:artist, :title, :duration]}}).html_safe},"
     result += "\"current_song\": #{new_data[:current_song].to_json(only: [:artist, :title, :duration]).html_safe},"
     result += "\"last_update\": \"#{timestamp}\""
-    result += "\"room\": \"#{room}\""
     result += '}'
     result
   end
 
   def self.push_to_longpoll(room)
     update_ts = Time.now.to_r.to_s
-    MessageQueue::BaseQueue.SendBroadcastMessage("longpoll.refresh", {update_ts: update_ts}, prepare_longpoll_message(room, update_ts))
+    MessageQueue::BaseQueue.SendBroadcastMessage("longpoll.refresh", {update_ts: update_ts, room: room}, prepare_longpoll_message(room, update_ts))
   end
 	
-	def self.refresh(room)
-		p "on refresh"
-		unless playing? (room)
-		  p 'do play_next'
-		  play_next(room)
+	def self.refresh(room=nil)
+		if room
+      refresh_room(room)
+    else
+      @players.each_key { | room_id | refresh_room(room_id)}
+    end
+  end
+
+  def self.refresh_room(room)
+    p "on refresh #{room}"
+    unless playing? (room)
+      p 'do play_next'
+      play_next(room)
       unless playing?(room) # instead of play silence play random song from cache
         play_random(room)
       end
     end
     push_to_longpoll(room)
-	end
+  end
 
 	def self.current_song(room)
 		playlist_item = current_playlist_item(room)
