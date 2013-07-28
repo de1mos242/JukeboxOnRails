@@ -11,9 +11,11 @@ gem 'haml-rails'
 gem 'bootstrap-sass'
 gem 'nokogiri'
 gem 'therubyracer'
+gem 'strong_parameters'
 
 group :audio do
-	gem 'gstreamer'
+  gem 'glib2', '1.2.6'
+	gem 'gstreamer', '1.2.6'
 end
 
 # Gems used only for assets and not required

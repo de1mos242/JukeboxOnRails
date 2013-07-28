@@ -112,7 +112,13 @@ class SongsController < ApplicationController
         cached_song = songs_in_cache.select {|s| s.url == song_data[:url]}
         song = nil
         song = cached_song[0] if cached_song.size > 0
-        song = Song.new(artist: song_data[:artist], title: song_data[:track_name], url: song_data[:url], duration: song_data[:duration]) if song.nil?
+        if song.nil?
+          song = Song.new
+          song.artist = song_data[:artist]
+          song.title = song_data[:track_name]
+          song.url = song_data[:url]
+          song.duration = song_data[:duration]
+        end
         @songs.push(song)
       end
     else
@@ -138,8 +144,12 @@ class SongsController < ApplicationController
     if Song.exists?(params[:song][:id])
       song = Song.find(params[:song][:id])
     else
-      user_song = params[:song]
-      song = Song.create(artist:user_song[:artist], title:user_song[:title], url:user_song[:url], duration:user_song[:duration])
+      song = Song.new
+      song.artist = params[:song][:artist]
+      song.title = params[:song][:title]
+      song.url = params[:song][:url]
+      song.duration = params[:song][:duration]
+      song.save!
     end
     
     MessageQueue::BaseQueue.SendBroadcastMessage("playlist.add.song", {}, song.id)

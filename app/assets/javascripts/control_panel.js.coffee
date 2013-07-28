@@ -6,6 +6,7 @@ current_song = null;
 current_song_timer = 0;
 prevous_song = null;
 last_update = null;
+room_id = 0;
 
 refreshPage = (request_data) ->
   return null unless (long_poll_server_url?)
@@ -24,14 +25,16 @@ refreshPage = (request_data) ->
   request.error(onRefreshResponseFailure);
   
 onRefreshResponse = (response) ->
-  if (typeof response != "undefined" && response != null && response.hasOwnProperty('current_song'))
-    $('#playlist_items_container').empty();
-    if (response.playlist_items != null && response.playlist_items.length > 0)
-      $('#playlistItemTemplate').tmpl(response.playlist_items).appendTo('#playlist_items_container')
-    current_song = response.current_song;
-    refreshCurrentSong();
+  if (typeof response != "undefined" && response != null )
+    if response.hasOwnProperty('current_song')
+      $('#playlist_items_container').empty();
+      if (response.playlist_items != null && response.playlist_items.length > 0)
+        $('#playlistItemTemplate').tmpl(response.playlist_items).appendTo('#playlist_items_container')
+      current_song = response.current_song;
+      refreshCurrentSong();
     last_update = response.last_update
-  refreshPage({"last_update" : last_update});
+    room_id = response.room
+  refreshPage({"last_update" : last_update, "room" : room_id});
 
 onRefreshResponseFailure = () ->
   setTimeout(refreshPage(null), 2000);

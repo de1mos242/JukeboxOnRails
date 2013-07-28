@@ -1,15 +1,15 @@
 class PlaylistItem < ActiveRecord::Base
   belongs_to :song
-  attr_accessible :position, :auto
+  #attr_accessible :position, :auto
 
   serialize :skip_makers, Array
 
-  scope :with_song, lambda { |song| {conditions: ['song_id = ?', song.id]} }
-  scope :position_sorted, order: "position asc" 
-  scope :downloaded, joins(:song).where("songs.filename is not null")
-  scope :in_queue, conditions: "position > 0"
-  scope :current_item, conditions: "position = 0"
-  scope :in_room, lambda { |room_id| joins(:song).where("room = ?", room_id).readonly(false) }
+  scope :with_song, -> (song) { where(song_id: song.id) }
+  scope :position_sorted, -> { order("position asc") }
+  scope :downloaded, -> {joins(:song).where("songs.filename is not null")}
+  scope :in_queue, -> { where("position > 0") }
+  scope :current_item, -> { where("position = 0") }
+  scope :in_room, ->(room_id) { joins(:song).where("songs.room" => room_id).readonly(false) }
 
   def self.skips_count_limit
     Rails.application.config.common_audio_config[:skip_counter].to_i

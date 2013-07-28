@@ -3,7 +3,10 @@
 
 %script#playlistItemTemplate{type:"text/x-jquery-tmpl"}
   - playlist_item = PlaylistItem.new
-  - playlist_item.song = Song.new(artist:"${song.artist}", title:"${song.title}", duration:"${song.duration}")
+  - playlist_item.song = Song.new
+  - playlist_item.song.artist = "${song.title}"
+  - playlist_item.song.title = "${song.title}"
+  - playlist_item.song.duration = "${song.duration}"
   = render partial: "control_panel/playlist_item", object: playlist_item
 = render partial: "control_panel/controls"
 .container-fluid
