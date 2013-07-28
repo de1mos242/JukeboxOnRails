@@ -13,8 +13,11 @@ class LongPollController < Sinatra::Base
 
   @@rooms = {}
 
-  def self.get_empty_room
-    {data: "{}", time: Time.now}
+  def get_empty_room
+    create_time = Time.now.to_r
+    empty_room = {data: "{\"last_update\":\"#{create_time.to_s}\", \"room\": 0 }", time: create_time}
+    @@rooms[0] = empty_room
+    empty_room
   end
 
   listener_callback = proc do |body, metadata|
@@ -22,7 +25,7 @@ class LongPollController < Sinatra::Base
     p "takes message for room #{room} with #{body}"
     @@rooms[room] = {}
     @@rooms[room][:data] = body
-    @@rooms[room][:time] = Time.at(metadata.headers["update_ts"].to_r)
+    @@rooms[room][:time] = metadata.headers["update_ts"].to_r
   end
 
   EM.next_tick do
@@ -82,7 +85,7 @@ class LongPollController < Sinatra::Base
       p "params: #{params.inspect} #{params["last_update"]} and #{params["last_update"].blank?}"
       if !params["last_update"].blank? && !params["room"].blank?
         p "run async"
-        request_time = Time.at(params["last_update"].to_r)
+        request_time = params["last_update"].to_r
 
         p "request_time: #{request_time}"
         pollster = proc do
@@ -100,7 +103,7 @@ class LongPollController < Sinatra::Base
         EM.defer(pollster, callback)
 
       else
-        p 'answer sync'
+        p "answer sync #{@@rooms[room_id][:data]}"
         callback.call({has_data: true, new_data: @@rooms[room_id][:data]})
         #body "ok"
       end

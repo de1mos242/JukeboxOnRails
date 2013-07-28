@@ -1,6 +1,6 @@
 development: &defaults
-  :app_id: "app_id"
-  :app_secret: "app_secret"
+  :app_id: "3583179"
+  :app_secret: "9YJ9gUotIYTMGV439z4U"
 
 test:
   <<: *defaults

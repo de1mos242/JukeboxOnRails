@@ -92,14 +92,14 @@ begin
 		exchange = channel.fanout("#{exchange_prefix}.playlist.skip")
 		channel.queue("#{exchange_prefix}.playlist.skip.queue", auto_delete:true).bind(exchange).subscribe do |metadata, payload|
     		room = metadata.heeaders["room_id"]
-        p "get skip for #{room}"
-        on_skip_message(room)
+        	p "get skip for #{room}"
+        	on_skip_message(room)
 		end
 
 		p "stop"
 		exchange = channel.fanout("#{exchange_prefix}.playlist.stop")
 		channel.queue("#{exchange_prefix}.playlist.stop.queue", auto_delete:true).bind(exchange).subscribe do |metadata, payload|
-        room = metadata.heeaders["room_id"]
+        	room = metadata.heeaders["room_id"]
     		p "get stop for #{room}"
     		on_stop_message(room)
 		end
@@ -107,7 +107,8 @@ begin
 		p "add song"
 		exchange = channel.fanout("#{exchange_prefix}.playlist.add.song")
 		channel.queue("#{exchange_prefix}.playlist.add_song.queue", auto_delete:true).bind(exchange).subscribe do |metadata, payload|
-        room = metadata.heeaders["room_id"]
+			p "metadata: #{metadata}"
+	        room = metadata.headers["room_id"]
     		p "add song for #{room}"
     		on_add_song(room, payload)
 		end

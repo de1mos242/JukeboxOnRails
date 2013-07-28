@@ -27,7 +27,8 @@ class Playlist
     result = '{'
     result += "\"playlist_items\": #{new_data[:playlist_items].to_json(include: {song: {only: [:artist, :title, :duration]}}).html_safe},"
     result += "\"current_song\": #{new_data[:current_song].to_json(only: [:artist, :title, :duration]).html_safe},"
-    result += "\"last_update\": \"#{timestamp}\""
+    result += "\"last_update\": \"#{timestamp}\","
+    result += "\"room\": \"#{room}\""
     result += '}'
     result
   end

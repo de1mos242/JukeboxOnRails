@@ -3,8 +3,8 @@ class ControlPanelController < ApplicationController
     #@songs = Song.downloaded
     @long_poll_server = Rails.application.config.common_audio_config[:long_poll_server]
     @playlist_items = PlaylistItem.position_sorted.in_queue
-    @volumes = AudioPlayback::GStreamPlayback.get_current_volume
-    @shoutcast_url = AudioPlayback::GStreamPlayback.get_shoutcast_url
+    #@volumes = AudioPlayback::GStreamPlayback.get_current_volume
+    @shoutcast_url = AudioPlayback::GStreamPlayback.shoutcast_url_for_room("public")
     @songs = Song.downloaded
     puts "shoutcast_url= #{@shoutcast_url}"
     

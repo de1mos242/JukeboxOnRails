@@ -12,11 +12,10 @@
     = yield(:head)
   %body
     %header.navbar.navbar-fixed-top
-      %nav.navbar-inner
-        .container
+      .navbar
+        .navbar-inner
           = render 'layouts/navigation'
-          .container.nav-collapse
-            %ul.nav.nav-list
+          %ul.nav.navbar-nav
             - if user_signed_in?
               %li= link_to current_user.username, current_user.url
               - if current_user.room_admin?

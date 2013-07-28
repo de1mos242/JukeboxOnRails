@@ -1,3 +1,5 @@
+gem 'glib2', '1.2.6'
+gem 'gstreamer', '1.2.6'
 require 'gst'
 require 'yaml'
 
@@ -49,17 +51,27 @@ module AudioPlayback
       @room_name = "#{room_name}.mp3"
     end
 
+    def self.shoutcast_url_for_room(room_name)
+      shoutcast_config = get_config("shoutcast.yml")
+      shoutcast_config[:listen_url] + "#{room_name}.mp3"
+    end
+
+    def self.get_config(yml_filename)
+      rails_root = File.expand_path('../../..', __FILE__)
+      env = ENV['RACK_ENV'] || 'development'
+      YAML.load(File.read(File.join(rails_root, "config", "audio", yml_filename)))[env]
+    end
+
     def prepare
       return if prepared?
 
       @rails_root = File.expand_path('../../..', __FILE__)
-      env = ENV['RACK_ENV'] || 'development'
-      shoutcast_config = YAML.load(File.read(File.join(@rails_root, "config", "audio", "shoutcast.yml")))[env]
-      speakers_config = YAML.load(File.read(File.join(@rails_root, "config", "audio", "speakers.yml")))[env]
+      shoutcast_config = self.class.get_config("shoutcast.yml")
+      speakers_config = self.class.get_config("speakers.yml")
 
       @playing = false
       
-      @pipeline = Gst::Pipeline.new
+      @pipeline = Gst::Pipeline.new("pipeline#{@room_name}")
 
       # create a disk reader
       @filesrc = Gst::ElementFactory.make("filesrc")
