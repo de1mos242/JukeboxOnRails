@@ -17,6 +17,9 @@ class User < ActiveRecord::Base
     Time.now >= expiration_date
   end
 
+  has_many :rooms, through: :room_memberships
+  has_many :room_memberships
+
   def self.find_for_vkontakte_oauth access_token
     user = User.where(:url => access_token.info.urls.Vkontakte).first
     p access_token.inspect

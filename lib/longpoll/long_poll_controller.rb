@@ -25,7 +25,7 @@ class LongPollController < Sinatra::Base
     p "takes message for room #{room} with #{body}"
     @@rooms[room] = {}
     @@rooms[room][:data] = body
-    @@rooms[room][:time] = metadata.headers["update_ts"].to_r
+    @@rooms[room][:time] = Time.at(metadata.headers["update_ts"].to_r)
   end
 
   EM.next_tick do
@@ -85,7 +85,7 @@ class LongPollController < Sinatra::Base
       p "params: #{params.inspect} #{params["last_update"]} and #{params["last_update"].blank?}"
       if !params["last_update"].blank? && !params["room"].blank?
         p "run async"
-        request_time = params["last_update"].to_r
+        request_time = Time.at(params["last_update"].to_r)
 
         p "request_time: #{request_time}"
         pollster = proc do
