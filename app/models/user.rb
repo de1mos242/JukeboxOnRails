@@ -8,16 +8,21 @@ class User < ActiveRecord::Base
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me
-  attr_accessible :nickname, :url, :username, :token
+  attr_accessible :nickname, :url, :username, :token, :expiration_date
 
   has_many :rooms, through: :room_memberships
   has_many :room_memberships
+
+  def vk_expired?
+    Time.now >= expiration_date
+  end
 
   def self.find_for_vkontakte_oauth access_token
     user = User.where(:url => access_token.info.urls.Vkontakte).first
     p access_token.inspect
     unless user.nil?
       user.token = access_token.credentials.token
+      user.expiration_date = Time.at(access_token.credentials.expires_at)
       user.save!
       user
     else
@@ -26,7 +31,8 @@ class User < ActiveRecord::Base
                    :nickname => access_token.info.nickname,
                    :email => access_token.uid.to_s+'@vk.com',
                    :token => access_token.credentials.token,
-                   :password => Devise.friendly_token[0,20])
+                   :password => Devise.friendly_token[0,20],
+                   expiration_date: Time.at(access_token.credentials.expires_at) )
     end
     has_admin = User.where(:roles, ROOM_ADMIN_ROLE).count > 0
     unless has_admin

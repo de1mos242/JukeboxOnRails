@@ -1,6 +1,6 @@
 class RoomsController < ApplicationController
 
-  before_filter :check_admin
+  before_filter :check_admin, except: "index"
 
   def check_admin
     unless user_signed_in?

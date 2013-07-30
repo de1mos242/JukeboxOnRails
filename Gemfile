@@ -43,7 +43,7 @@ gem 'god'
 
 gem 'devise'
 gem 'omniauth-vkontakte'
-gem 'vkontakte_api'
+gem 'vkontakte_api', '1.1'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
@@ -54,6 +54,7 @@ gem 'vkontakte_api'
 group :development do
   gem 'capistrano'
   gem "rvm-capistrano"
+  gem 'quiet_assets'
 end
 
 group :development, :test do

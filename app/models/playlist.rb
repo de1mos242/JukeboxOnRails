@@ -10,6 +10,7 @@ class Playlist
     Room.all.each do |room|
       @players[room.id] = AudioPlayback::GStreamPlayback.new(room.id)
     end
+    @players[0] = AudioPlayback::GStreamPlayback.new(0)
     p @players.inspect
   end
 
