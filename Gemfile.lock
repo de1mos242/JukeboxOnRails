@@ -88,7 +88,7 @@ GEM
       activesupport (>= 3.1, < 4.1)
       haml (>= 3.1, < 4.1)
       railties (>= 3.1, < 4.1)
-    hashie (2.0.5)
+    hashie (1.2.0)
     highline (1.6.19)
     hike (1.2.3)
     httpauth (0.2.0)
@@ -143,6 +143,8 @@ GEM
     pg (0.16.0)
     pkg-config (1.1.4)
     polyglot (0.3.3)
+    quiet_assets (1.0.2)
+      railties (>= 3.1, < 5.0)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -233,11 +235,11 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
-    vkontakte_api (1.2)
+    vkontakte_api (1.1)
       faraday (~> 0.8)
       faraday_middleware (~> 0.8)
-      faraday_middleware-parse_oj (~> 0.2)
-      hashie (~> 2.0)
+      faraday_middleware-parse_oj (~> 0.1)
+      hashie (~> 1.2)
       oauth2 (~> 0.8)
     warden (1.2.3)
       rack (>= 1.0)
@@ -262,6 +264,7 @@ DEPENDENCIES
   nokogiri
   omniauth-vkontakte
   pg
+  quiet_assets
   rails (= 3.2.11)
   rails-backbone
   rspec
@@ -274,4 +277,4 @@ DEPENDENCIES
   thin
   uglifier (>= 1.0.3)
   unicorn
-  vkontakte_api
+  vkontakte_api (= 1.1)

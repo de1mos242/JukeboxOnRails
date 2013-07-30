@@ -95,7 +95,7 @@ module AudioPlayback
 
         @audioconvert = Gst::ElementFactory.make("audioconvert")
         @lame = Gst::ElementFactory.make("lame")
-        @lame.bitrate = 192
+        #@lame.bitrate = 192
 
         @taginject = Gst::ElementFactory.make("taginject")
 
