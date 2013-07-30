@@ -38,6 +38,7 @@ module AudioPlayback
     def get_current_volume
       {"min" => 30, "max" => 100, "current" => (volume * 100).round}
     end
+    p "from #{Thread.current} created #{@play_thread}"
 
     def set_volume(value)
       @volume = value
