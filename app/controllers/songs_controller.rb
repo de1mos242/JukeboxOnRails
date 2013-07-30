@@ -94,6 +94,7 @@ class SongsController < ApplicationController
   end
 
   def find
+    headers['Last-Modified'] = Time.now.httpdate
     if !params["find_query"].blank? && user_signed_in?
       #found_songs = AudioProviders::VKProvider.find_by_query(params["find_query"])[0...30]
       count = 100
