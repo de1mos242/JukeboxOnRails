@@ -30,7 +30,7 @@ class JukeboxOnRails.Routers.ControlPanelRouter extends Backbone.Router
     $('#find_song_button').attr('disabled', 'disabled')
     $('#find_song_button').attr('value', 'Searching...')
     self = this
-    @songs.fetch({data: {find_query: query}, success: () ->
+    @songs.fetch({cache: false, data: {find_query: query}, success: () ->
         self.on_fetch_songs()
     error: (e) ->
       self.on_failure_search(e)
