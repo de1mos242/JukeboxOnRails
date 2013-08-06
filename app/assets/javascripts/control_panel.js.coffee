@@ -6,7 +6,7 @@ current_song = null;
 current_song_timer = 0;
 prevous_song = null;
 last_update = null;
-room_id = 0;
+room_id = 2;
 
 refreshPage = (request_data) ->
   return null unless (long_poll_server_url?)

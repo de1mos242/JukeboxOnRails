@@ -149,7 +149,7 @@ class SongsController < ApplicationController
       song.title = params[:song][:title]
       song.url = params[:song][:url]
       song.duration = params[:song][:duration]
-      song.room = params[:room]
+      song.room = Room.find(2) #TODO
       song.save!
     end
     

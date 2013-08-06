@@ -6,8 +6,8 @@ class Room < ActiveRecord::Base
 
   has_many :songs
 
-  def get_main_room
-  	room = self.find(main_room:true)
+  def self.get_main_room
+  	room = self.where(main_room: true).first
   end
 
 end

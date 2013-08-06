@@ -7,36 +7,35 @@ class Playlist
 
   def self.prepare_players
     @players = {}
-    Room.all.each do |room|
+    Room.find(:all).each do |room|
       @players[room.id] = AudioPlayback::GStreamPlayback.new(room.id)
     end
-    @players[0] = AudioPlayback::GStreamPlayback.new(0)
     p @players.inspect
   end
 
   prepare_players
 
-  def self.get_data(room)
+  def self.get_data(room_id)
     data = {}
-    data[:playlist_items] = PlaylistItem.position_sorted.in_queue.in_room(room).all
-    data[:current_song] = PlaylistItem.current_song(room)
+    data[:playlist_items] = PlaylistItem.position_sorted.in_queue.in_room(room_id).all
+    data[:current_song] = PlaylistItem.current_song(room_id)
     data
   end
 
-  def self.prepare_longpoll_message(room, timestamp)
-    new_data = get_data(room)
+  def self.prepare_longpoll_message(room_id, timestamp)
+    new_data = get_data(room_id)
     result = '{'
     result += "\"playlist_items\": #{new_data[:playlist_items].to_json(include: {song: {only: [:artist, :title, :duration]}}).html_safe},"
     result += "\"current_song\": #{new_data[:current_song].to_json(only: [:artist, :title, :duration]).html_safe},"
     result += "\"last_update\": \"#{timestamp}\","
-    result += "\"room\": \"#{room}\""
+    result += "\"room\": \"#{room_id}\""
     result += '}'
     result
   end
 
   def self.push_to_longpoll(room)
     update_ts = Time.now.to_r.to_s
-    MessageQueue::BaseQueue.SendBroadcastMessage("longpoll.refresh", {update_ts: update_ts, room: room}, prepare_longpoll_message(room, update_ts))
+    MessageQueue::BaseQueue.SendBroadcastMessage("longpoll.refresh", {update_ts: update_ts, room: room.id, default_room: room.main_room}, prepare_longpoll_message(room.id, update_ts))
   end
 	
 	def self.refresh(room=nil)
@@ -47,15 +46,16 @@ class Playlist
     end
   end
 
-  def self.refresh_room(room)
-    p "on refresh #{room}"
-    unless playing? (room)
+  def self.refresh_room(room_id)
+    p "on refresh #{room_id}"
+    unless playing? (room_id)
       p 'do play_next'
-      play_next(room)
-      unless playing?(room) # instead of play silence play random song from cache
-        play_random(room)
+      play_next(room_id)
+      unless playing?(room_id) # instead of play silence play random song from cache
+        play_random(room_id)
       end
     end
+    room = Room.find(room_id)
     push_to_longpoll(room)
   end
 

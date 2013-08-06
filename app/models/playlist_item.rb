@@ -9,7 +9,7 @@ class PlaylistItem < ActiveRecord::Base
   scope :downloaded, -> {joins(:song).where("songs.filename is not null")}
   scope :in_queue, -> { where("position > 0") }
   scope :current_item, -> { where("position = 0") }
-  scope :in_room, ->(room_id) { joins(:song).where("songs.room" => room_id).readonly(false) }
+  scope :in_room, ->(room_id) { joins(:song).where("songs.room_id" => room_id).readonly(false) }
 
   def self.skips_count_limit
     Rails.application.config.common_audio_config[:skip_counter].to_i

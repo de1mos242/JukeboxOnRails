@@ -13,17 +13,24 @@ class LongPollController < Sinatra::Base
 
   @@rooms = {}
 
-  def get_empty_room
-    create_time = Time.now.to_r
-    empty_room = {data: "{\"last_update\":\"#{create_time.to_s}\", \"room\": 0 }", time: create_time}
-    @@rooms[0] = empty_room
-    empty_room
+  def get_default_room
+    #create_time = Time.now.to_r
+    #empty_room = {data: "{\"last_update\":\"#{create_time.to_s}\", \"room\": 0 }", time: create_time}
+    #@@rooms[0] = empty_room
+    #empty_room
+    found_room_id = nil
+    p "scan rooms for default: #{@@rooms.inspect}"
+    @@rooms.each_pair do |key, value|
+      found_room_id = key if value[:default]
+    end
+    @@rooms[found_room_id]
   end
 
   listener_callback = proc do |body, metadata|
     room = metadata.headers["room"]
     p "takes message for room #{room} with #{body}"
     @@rooms[room] = {}
+    @@rooms[room][:default] = metadata.headers["default_room"]
     @@rooms[room][:data] = body
     @@rooms[room][:time] = Time.at(metadata.headers["update_ts"].to_r)
   end
@@ -77,9 +84,11 @@ class LongPollController < Sinatra::Base
         end
       end
 
-      room_id = params["room"]
-      unless @@rooms.has_key?(room_id)
-        @@rooms[room_id] = get_empty_room
+      if params.has_key?("room")
+        room_id = params["room"].to_i
+        unless @@rooms.has_key?(room_id)
+          @@rooms[room_id] = get_default_room
+        end
       end
 
       p "params: #{params.inspect} #{params["last_update"]} and #{params["last_update"].blank?}"
@@ -103,8 +112,8 @@ class LongPollController < Sinatra::Base
         EM.defer(pollster, callback)
 
       else
-        p "answer sync #{@@rooms[room_id][:data]}"
-        callback.call({has_data: true, new_data: @@rooms[room_id][:data]})
+        p "answer sync #{get_default_room}"
+        callback.call({has_data: true, new_data: get_default_room[:data]})
         #body "ok"
       end
 

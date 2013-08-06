@@ -43,11 +43,6 @@ def on_add_song(room, song_id)
 	Playlist.add_song(room, song)
 end
 
-def push_to_longpoll(channel, exchange_prefix)
-  exchange = channel.fanout("#{exchange_prefix}.longpoll.refresh")
-
-end
-
 begin
 	AMQP.start(host: credentials[:location],
 			user: credentials[:user], 
