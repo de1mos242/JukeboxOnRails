@@ -10,6 +10,8 @@ class Song < ActiveRecord::Base
   validate :url, presents:true
   validate :song_hash, presents:true
 
+  belongs_to :room
+
   scope :downloaded, -> { where("filename is not null") }
   #scope :in_playlist, -> {joins("songs").where("songs.filename is not null")}
   scope :with_url, -> (url) { where(song_hash: url.gsub(/^.+\//, '') ) }

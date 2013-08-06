@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130728071632) do
+ActiveRecord::Schema.define(:version => 20130805033745) do
 
   create_table "playlist_items", :force => true do |t|
     t.integer  "song_id"
@@ -37,9 +37,14 @@ ActiveRecord::Schema.define(:version => 20130728071632) do
 
   create_table "rooms", :force => true do |t|
     t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.boolean  "public_room"
+    t.boolean  "main_room"
   end
+
+  add_index "rooms", ["main_room"], :name => "index_rooms_on_main_room"
+  add_index "rooms", ["public_room"], :name => "index_rooms_on_public_room"
 
   create_table "songs", :force => true do |t|
     t.string   "artist"
