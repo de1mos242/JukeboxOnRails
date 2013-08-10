@@ -17,7 +17,7 @@ class Playlist
 
   def self.get_data(room_id)
     data = {}
-    data[:playlist_items] = PlaylistItem.position_sorted.in_queue.in_room(room_id).all
+    data[:playlist_items] = PlaylistItem.position_sorted.in_queue.in_room(room_id).to_a
     data[:current_song] = PlaylistItem.current_song(room_id)
     data
   end
@@ -147,7 +147,7 @@ class Playlist
   end
 
   def self.play_random(room)
-    cached_songs = Song.downloaded.in_room(room).all
+    cached_songs = Song.downloaded.in_room(room).to_a
     add_song(room, cached_songs[rand(cached_songs.length)], true) unless cached_songs.empty?
   end
 

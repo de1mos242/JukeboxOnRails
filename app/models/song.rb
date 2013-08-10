@@ -15,7 +15,7 @@ class Song < ActiveRecord::Base
   scope :downloaded, -> { where("filename is not null") }
   #scope :in_playlist, -> {joins("songs").where("songs.filename is not null")}
   scope :with_url, -> (url) { where(song_hash: url.gsub(/^.+\//, '') ) }
-  scope :in_room, -> (room_id) { where(room: room_id) }
+  scope :in_room, -> (room_id) { where(room_id: room_id) }
   
   def downloaded?
   	not self.filename.blank?
