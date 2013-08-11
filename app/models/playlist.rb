@@ -112,7 +112,7 @@ class Playlist
 		unless next_item.nil?
 			p "next_item found"
 			p "kick player in room #{room}: #{next_item.position}: #{next_item.song.artist} - #{next_item.song.title}"
-      @players[room].play_song({
+			@players[room].play_song({
 				filename: next_item.song.filename, 
 				artist: next_item.song.artist, 
 				title: next_item.song.title}) do 
