@@ -1,12 +1,3 @@
 .container-fluid
-  .row-fluid
-    .span1
-      = form_tag(playlist_skip_path, remote:true) do |form|
-        = submit_tag 'skip', class:"btn btn-warning"
-    .span9
-      %div
-        %span= 'Now playing: '
-        %span.alert.alert-success
-          %span#current_song
-    .span2
-      =link_to "Stream", @shoutcast_url unless @shoutcast_url.blank?
+  .row-fluid#control_panel
+    

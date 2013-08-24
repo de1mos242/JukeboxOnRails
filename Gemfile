@@ -43,6 +43,7 @@ gem 'god'
 
 gem 'devise'
 gem 'omniauth-vkontakte'
+gem 'certified'
 gem 'vkontakte_api', '1.1'
 
 # To use ActiveModel has_secure_password

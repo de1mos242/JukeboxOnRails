@@ -69,8 +69,8 @@ class Playlist
 		PlaylistItem.current_item.in_room(room).first()
 	end
 
-	def self.add_song(room, song, auto = false)
-		PlaylistItem.add(room, song, auto)
+	def self.add_song(room_id, song, auto = false)
+		PlaylistItem.add(room_id, song, auto)
 		unless song.downloaded?
 			start_download = Proc.new do 
 				puts "#{song.artist} - #{song.title} run async download"
@@ -80,11 +80,11 @@ class Playlist
 				puts "#{song.artist} - #{song.title} #{filename} downloaded callback"
 				song.filename = filename
 				song.save!
-				refresh(room)
+				refresh(room_id)
 			end
 			EM.defer(start_download, on_download)
     end
-    refresh(room)
+    refresh(room_id)
 	end	
 
 	def self.playing?(room)
@@ -93,8 +93,8 @@ class Playlist
 	end
 
 	def self.skip(room)
-		p "on skip"
-    @players[room].stop if playing?
+		p "on skip in room #{room}"
+    @players[room].stop if playing?(room)
 		#refresh
 		p "skip finished"
 	end

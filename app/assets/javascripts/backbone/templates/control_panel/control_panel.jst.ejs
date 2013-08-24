@@ -1,0 +1,18 @@
+<div class='span1'>
+  <form accept-charset="UTF-8" action="/playlist_items/skip" data-remote="true" method="post">
+    <input class="btn btn-warning" name="commit" type="submit" value="skip" />
+  </form>
+</div>
+<div class='span9'>
+  <div>
+    <span>Now playing:</span>
+    <span class='alert alert-success'>
+      <span><%= current_song.attributes.artist %> - <%= current_song.attributes.title %></span>
+      <span id='current_song_elapsed_time'>00:00</span>/<span><%= current_song.attributes.duration %></span>
+
+    </span>
+  </div>
+</div>
+<div class='span2'>
+  <a href="http://192.168.25.36:8000/public.mp3">Stream</a>
+</div>

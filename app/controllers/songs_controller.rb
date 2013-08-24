@@ -149,11 +149,11 @@ class SongsController < ApplicationController
       song.title = params[:song][:title]
       song.url = params[:song][:url]
       song.duration = params[:song][:duration]
-      song.room = Room.find(2) #TODO
+      song.room = Room.get_main_room #TODO
       song.save!
     end
     
-    MessageQueue::BaseQueue.SendBroadcastMessage("playlist.add.song", {}, song.id)
+    MessageQueue::BaseQueue.SendBroadcastMessage("playlist.add.song", {"room_id" => song.room.id}, song.id)
     #Playlist.add_song(song)
     render :nothing => true
   end

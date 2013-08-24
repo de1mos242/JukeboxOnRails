@@ -7,7 +7,6 @@
     %meta{:content => "Server-side audio player", :name => "description"}
     %meta{:content => "De1mos", :name => "author"}
     = stylesheet_link_tag    "application", :media => "all"
-    = javascript_include_tag "application"
     = csrf_meta_tags
     = yield(:head)
   %body
@@ -30,9 +29,6 @@
             .span12
               = render 'layouts/messages'
               = yield
-              :javascript
-                $(function() {
-                  window.router = new JukeboxOnRails.Routers.ControlPanelRouter({songs: []});
-                  Backbone.history.start({pushState: true});
-                });
     %footer &copy De1mos 2012-2013
+    = javascript_include_tag "application"
+    

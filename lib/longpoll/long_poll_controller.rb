@@ -57,6 +57,12 @@ class LongPollController < Sinatra::Base
 
   # We need something to respond to OPTIONS, even if it doesn't do anything
   http_options '/' do
+    p "handling options"
+    halt 200
+  end
+
+  http_options '/refresh' do
+    p "handling options for refresh"
     halt 200
   end
 

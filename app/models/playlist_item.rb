@@ -15,8 +15,10 @@ class PlaylistItem < ActiveRecord::Base
     Rails.application.config.common_audio_config[:skip_counter].to_i
   end
   
-  def self.add(room, song, auto = false)
-  	unless PlaylistItem.in_room(room).with_song(song).first.nil?
+  def self.add(room_id, song, auto = false)
+    p "add song #{song.id} in room #{room_id} auto = #{auto}"
+  	unless PlaylistItem.in_room(room_id).with_song(song).first.nil?
+      p "already have"
   		return nil
   	end
 

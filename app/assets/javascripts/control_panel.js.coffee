@@ -6,7 +6,12 @@ current_song = null;
 current_song_timer = 0;
 prevous_song = null;
 last_update = null;
-room_id = 2;
+room_id = 1;
+
+$(() ->
+  window.router = new JukeboxOnRails.Routers.ControlPanelRouter({songs: []});
+  Backbone.history.start({pushState: true});
+);
 
 refreshPage = (request_data) ->
   return null unless (long_poll_server_url?)
@@ -60,7 +65,7 @@ onFindSongs = (response) ->
   $('#songTemplate').tmpl(response).appendTo('#songs_container');
   addToPlaylistBlocker();
 
-setInterval(refreshCurrentSong, 1000);
+# setInterval(refreshCurrentSong, 1000);
 
 addToPlaylistBlocker = () ->
   $(".add_to_playlist").click(
@@ -79,5 +84,5 @@ $(() ->
   #      onFindSongs(data);
   #  );
 
-  refreshPage(null);
+  # refreshPage(null);
 );
