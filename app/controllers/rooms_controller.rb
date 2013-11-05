@@ -75,7 +75,7 @@ class RoomsController < ApplicationController
     @room = Room.find(params[:id])
 
     respond_to do |format|
-      if @room.update(params[:room].permit(:name, :users, :user_ids))
+      if @room.update_attributes(params[:room].permit(:name, :users, :user_ids))
         format.html { redirect_to @room, notice: 'Room was successfully updated.' }
         format.json { head :no_content }
       else

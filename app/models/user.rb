@@ -48,4 +48,13 @@ class User < ActiveRecord::Base
   def room_admin?
     roles == ROOM_ADMIN_ROLE
   end
+
+  def get_rooms
+    if room_admin?
+      Room.all
+    else
+      rooms + Room.public_rooms
+
+    end
+  end
 end
