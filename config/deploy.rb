@@ -50,17 +50,17 @@ namespace :deploy do
   task :restart do
     run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -USR2 `cat #{unicorn_pid}`; else cd #{deploy_to}/current && bundle exec unicorn_rails -c #{unicorn_conf} -E #{rails_env} -D; fi"
     run "cd #{deploy_to}/current && bundle exec thin restart -C #{thin_conf}"
-    run "cd #{deploy_to}/current && god restart jukebox_player"
+    run "cd #{deploy_to}/current && bundle exec god restart jukebox_player"
   end
   task :start do
     run "cd #{deploy_to}/current && bundle exec unicorn_rails -c #{unicorn_conf} -E #{rails_env} -D"
     run "cd #{deploy_to}/current && bundle exec thin start -C #{thin_conf}"
-    run "cd #{deploy_to}/current && god -c script/god/player.god"
+    run "cd #{deploy_to}/current && bundle exec god -c script/god/player.god"
   end
   task :stop do
     run "if [ -f #{unicorn_pid} ] && [ -e /proc/$(cat #{unicorn_pid}) ]; then kill -QUIT `cat #{unicorn_pid}`; fi"
     run "cd #{deploy_to}/current && bundle exec thin stop -C #{thin_conf}"
     run "cd #{deploy_to}/current && god stop jukebox_player"
-    run "cd #{deploy_to}/current && god quit"
+    run "cd #{deploy_to}/current && bundle exec god quit"
   end
 end
