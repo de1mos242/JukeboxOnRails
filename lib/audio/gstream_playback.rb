@@ -61,7 +61,7 @@ module AudioPlayback
       @decoder = Gst::ElementFactory.make("mad")
 
       @volume_control = Gst::ElementFactory.make("volume")
-      @volume_control.volume = 0.5
+      @volume_control.volume = 0.5 if @volume_control != nil
 
       @tee = Gst::ElementFactory.make("tee")
 
@@ -91,11 +91,13 @@ module AudioPlayback
 
         @shoutcast_url = shoutcast_config[:listen_url]
       end
-
-      @pipeline.add(@filesrc, @decoder, @volume_control, @tee)
+      
+      @pipeline.add(@filesrc, @decoder, @volume_control, @tee) if @volume_control != nil
+      @pipeline.add(@filesrc, @decoder, @tee) if @volume_control == nil
       @pipeline.add(@audiosink_queue, @audiosink) if speakers_config[:enabled]
       @pipeline.add(@shoutcast_queue, @audioconvert, @lame, @taginject, @shoutcast) if shoutcast_config[:enabled]
-      @filesrc >> @decoder >> @volume_control >> @tee
+      @filesrc >> @decoder >> @volume_control >> @tee if @volume_control != nil
+      @filesrc >> @decoder >> @tee if @volume_control == nil
       @tee >> @audiosink_queue >> @audiosink if speakers_config[:enabled]
       @tee >> @shoutcast_queue >> @audioconvert >> @lame >> @taginject >> @shoutcast if shoutcast_config[:enabled]
 
@@ -191,12 +193,13 @@ module AudioPlayback
 
     def volume
       prepare unless prepared?
-      @volume_control.volume
+      @volume_control.volume if @volume_control != nil
+      100 if @volume_control == nil
     end
 
     def volume=(value)
       prepare unless prepared?
-      @volume_control.volume = [value,self.get_current_volume["min"]].max/100.0
+      @volume_control.volume = [value,self.get_current_volume["min"]].max/100.0 if @volume_control != nil
     end
 
     def current_position
